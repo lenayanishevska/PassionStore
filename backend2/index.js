@@ -1,10 +1,14 @@
-const express = require('express');
+const path = require('path');
 const dotenv =  require('dotenv');
-const sequelize = require('./db');
+
+dotenv.config({
+  path: path.join(__dirname, '.env'),
+});
+
+const express = require('express');
+const sequelize = require('./models');
 const cors = require('cors');
 const router = require('./routes/index');
-
-dotenv.config();
 
 const PORT = process.env.PORT || 5001;
 
