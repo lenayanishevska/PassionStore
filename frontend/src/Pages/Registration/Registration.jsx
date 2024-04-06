@@ -14,6 +14,7 @@ export const Registration = () => {
   const data = {fullName: fullName, email:email, password:password};
   const redirect = state?.from ? state.from : '/';
 
+
   const {
     userRegister: {loading, userInfo, error }
   } = useSelector((state) => state);
