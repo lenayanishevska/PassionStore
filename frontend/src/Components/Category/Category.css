@@ -1,0 +1,16 @@
+.category-item{
+    width: 90%;
+    border-radius: 20px;
+    background: rgba(204, 179, 160, 0.25);
+    height: 50px;
+}
+
+.category-item h3 {
+    color: var(--dark-black-color);
+    font-size: 20px;
+    font-weight: 200;
+}
+
+.category-item h3:hover {
+    color: var(--pastel-red-color);
+}
