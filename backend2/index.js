@@ -6,7 +6,7 @@ dotenv.config({
 });
 
 const express = require('express');
-const sequelize = require('./models');
+const { sequelize } = require('./models');
 const cors = require('cors');
 const router = require('./routes/index');
 
