@@ -1,6 +1,6 @@
 import React from 'react'
 import './CategoriesSlider.css'
-import categories from '../../data.js'
+import {categories} from '../../data.js'
 import Category from '../Category/Category.jsx'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
