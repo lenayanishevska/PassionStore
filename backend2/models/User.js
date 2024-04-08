@@ -1,13 +1,39 @@
-const sequelize = require('.')
-const {DataTypes} = require('sequelize')
+module.exports = (sequelize, Sequelize) => {
+  const User = sequelize.define('User', {
+    id: {
+      field: 'id',
+      type: Sequelize.INTEGER(),
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    firstname: {
+      field: 'firstname',
+      type: Sequelize.STRING(255),
+      allowNull: false,
+    },
+    lastname: {
+      field: 'lastname',
+      type: Sequelize.STRING(255),
+      allowNull: false,
+    },
+    email: {
+      field: 'email',
+      type: Sequelize.STRING(255),
+      allowNull: false,
+    },
+    password: {
+      field: 'password',
+      type: Sequelize.STRING(255),
+      allowNull: false,
+    },
+  }, {
+    timestamps: false,
+    tableName: 'users',
+  });
 
-const User = sequelize.define('user', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    firstName: {type: DataTypes.STRING, required: true},
-    lastName: {type: DataTypes.STRING, required: true},
-    email: {type: DataTypes.STRING, unique: true,required: true},
-    password: {type: DataTypes.STRING, required: true},
-    isAdmin: {type: DataTypes.BOOLEAN, required: true, defaultValue: false},
-})
+  User.associate = () => {
+  };
 
-module.exports = {User}
+  return User;
+};
