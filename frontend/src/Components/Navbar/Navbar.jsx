@@ -36,12 +36,12 @@ export const Navbar = () => {
                 <h2 onMouseEnter={() => setMenu("women")} 
                     onMouseLeave={() => setMenu("")} 
                     onClick={() => setMenu("women")}>
-                    <Link to='/women'>Women</Link> {menu === "women"?<hr/>: <></>} 
+                    <Link to='/products/women'>Women</Link> {menu === "women"?<hr/>: <></>} 
                 </h2>
                 <h2 onMouseEnter={() => setMenu("men")} 
                     onMouseLeave={() => setMenu("")} 
                     onClick={() => {setMenu("men")}}>
-                    <Link to='/men'>Men</Link> {menu === "men"?<hr/>: <></>}
+                    <Link to='products/men'>Men</Link> {menu === "men"?<hr/>: <></>}
                 </h2>
 
                 <h2 onClick={() => {setMenu("aboutUs")}}>

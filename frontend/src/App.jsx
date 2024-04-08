@@ -4,7 +4,7 @@ import { Navbar } from './Components/Navbar/Navbar'
 import { Home } from './Pages/Home/Home'
 import { GenderCategory } from './Pages/GenderCategory/GenderCategory'
 import { AboutUs } from './Pages/AboutUs/AboutUs'
-import { Product } from './Pages/Product/Product'
+import { ProductDetail } from './Pages/ProductDetail/ProductDetail'
 import { Favorites } from './Pages/Favorites/Favorites'
 import { Cart } from './Pages/Cart/Cart'
 import { Login } from './Pages/Login/Login'
@@ -22,10 +22,9 @@ function App() {
       <Navbar/>
       <Routes>
         <Route path='/' element={<Home/>}></Route>
-        <Route path='/men' element={<GenderCategory category="women"/>}></Route>
-        <Route path='/women' element={<GenderCategory category="men"/>}></Route>
+        <Route path="/products/:category" element={<GenderCategory />}></Route>
         <Route path='/aboutUs' element={<AboutUs/>}></Route>
-        <Route path='/product/:productId' element={<Product/>}></Route>
+        <Route path='/products/:category/:productId' element={<ProductDetail/>}></Route>
 
         <Route path='/cart' element={<Cart/>}></Route>
         <Route path='/favorite' element={<Favorites/>}></Route>

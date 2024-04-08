@@ -3,6 +3,7 @@ import './Registration.css'
 import { Link, useLocation, useNavigate} from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
 import { registerAction } from '../../redux/Actions/UserActions';
+import toast from 'react-hot-toast';
 
 export const Registration = () => {
   const [fullName, setFullName] = useState("");
