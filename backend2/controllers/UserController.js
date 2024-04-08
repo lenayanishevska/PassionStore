@@ -11,7 +11,7 @@ const generateJwt = (id, email, role) => {
 
 class UserController {
   async registration(req, res, next) {
-    const { fullName, email, password, role } = req.body;
+    const { fullName, email, password} = req.body;
 
     if (!email || !password) {
       return next(ApiError.badRequest("Wrong email or password!"));
@@ -22,24 +22,22 @@ class UserController {
       return next(ApiError.badRequest("The user already exist!"));
     }
 
-    const [firstName, lastName] = fullName.split(" ");
+    const [firstname, lastname] = fullName.split(" ");
 
     const hashPassword = await bcrypt.hash(password, 5);
     const user = await User.create({
-      firstName,
-      lastName,
+      firstname,
+      lastname,
       email,
-      role,
       password: hashPassword,
     });
-    const token = generateJwt(user.id, user.email, user.role);
+    const token = generateJwt(user.id, user.email);
     return res.json({
       id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstname: user.firstname,
+      lastname: user.lastname,
       email: user.email,
       password: user.password,
-      isAdmin: user.isAdmin,
       token: token,
     });
   }
@@ -54,20 +52,19 @@ class UserController {
     if (!comparePassword) {
       return next(ApiError.internal("Wrong password"));
     }
-    const token = generateJwt(user.id, user.email, user.role);
+    const token = generateJwt(user.id, user.email);
     return res.json({
       id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstname: user.firstname,
+      lastname: user.lastname,
       email: user.email,
       password: user.password,
-      isAdmin: user.isAdmin,
       token: token,
     });
   }
 
   async check(req, res, next) {
-    const token = generateJwt(req.user.id, req.user.email, req.user.role);
+    const token = generateJwt(req.user.id, req.user.email);
     return res.json({ token });
   }
 }
