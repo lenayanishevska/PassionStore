@@ -6,7 +6,7 @@ import product from '../../assets/pictures/Berfinben.jpeg'
 export default function Product({item}) {
   return (
     <div className='product flex-column'>
-        <img src='' alt="" />
+        <img src={item.img[0]} alt="" />
         <div className="info flex-column">
             <div className="name-like flex-row">
                 <h3>{item.name}</h3>

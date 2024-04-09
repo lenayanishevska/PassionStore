@@ -24,7 +24,15 @@
     justify-content: center;
     align-items: center;
 }
-.footer-parts li, p{
+.footer-parts li{
+    text-align: center;
+    margin: 20px 0px;
+    font-size: 18px;
+    color: var( --dark-grey-color);
+    font-weight: 200;
+}
+
+.footer-parts p{
     text-align: center;
     margin: 20px 0px;
     font-size: 18px;
