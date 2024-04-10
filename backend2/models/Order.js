@@ -1,4 +1,6 @@
+
 module.exports = (sequelize, Sequelize) => {
+
   const Order = sequelize.define('Order', {
     id: {
       field: 'id',
@@ -7,17 +9,32 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
-    name: {
-      field: 'name',
-      type: Sequelize.STRING(255),
+    date: {
+      field: 'date',
+      type: Sequelize.DATE,
       allowNull: false,
+      defaultValue: Sequelize.NOW,
+    },
+    total_amount: {
+      field: 'total_amount',
+      type: Sequelize.FLOAT,
+      allowNull: false,
+    },
+    status: {
+      field: 'status',
+      type: Sequelize.ENUM('Processing', 'Completed'),
+      allowNull: false,
+      defaultValue: 'Processing',
     },
   }, {
     timestamps: false,
     tableName: 'orders',
   });
 
-  Order.associate = () => {
+  Order.associate = (models) => {
+    Order.belongsTo(models.User);
+    Order.hasMany(models.OrderProduct);
+    Order.hasOne(models.Income);
   };
 
   return Order;

@@ -22,20 +22,20 @@ class UserController {
       return next(ApiError.badRequest("The user already exist!"));
     }
 
-    const [firstname, lastname] = fullName.split(" ");
+    const [first_name, last_name] = fullName.split(" ");
 
     const hashPassword = await bcrypt.hash(password, 5);
     const user = await User.create({
-      firstname,
-      lastname,
+      first_name,
+      last_name,
       email,
       password: hashPassword,
     });
     const token = generateJwt(user.id, user.email);
     return res.json({
       id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
+      first_name: user.first_name,
+      last_name: user.last_name,
       email: user.email,
       password: user.password,
       token: token,
@@ -55,8 +55,8 @@ class UserController {
     const token = generateJwt(user.id, user.email);
     return res.json({
       id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
+      first_name: user.first_name,
+      last_name: user.last_name,
       email: user.email,
       password: user.password,
       token: token,

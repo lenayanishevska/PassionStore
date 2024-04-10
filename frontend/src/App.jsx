@@ -5,7 +5,6 @@ import { Home } from './Pages/Home/Home'
 import { GenderCategory } from './Pages/GenderCategory/GenderCategory'
 import { AboutUs } from './Pages/AboutUs/AboutUs'
 import { ProductDetail } from './Pages/ProductDetail/ProductDetail'
-import { Favorites } from './Pages/Favorites/Favorites'
 import { Cart } from './Pages/Cart/Cart'
 import { Login } from './Pages/Login/Login'
 import { Registration } from './Pages/Registration/Registration'
@@ -27,7 +26,6 @@ function App() {
         <Route path='/products/:category/:productId' element={<ProductDetail/>}></Route>
 
         <Route path='/cart' element={<Cart/>}></Route>
-        <Route path='/favorite' element={<Favorites/>}></Route>
         <Route path='/login' element={user ? <Profile /> : <Login/>} ></Route>
         <Route path='/registration' element={ <Registration/>}></Route>
       </Routes>

@@ -17,7 +17,8 @@ module.exports = (sequelize, Sequelize) => {
     tableName: 'attributes',
   });
 
-  Attribute.associate = () => {
+  Attribute.associate = (models) => {
+    Attribute.belongsToMany(models.Product, { through: models.ProductAttribute});
   };
 
   return Attribute;

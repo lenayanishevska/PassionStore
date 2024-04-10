@@ -1,5 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const Option = sequelize.define('Option', {
+
+  const Size = sequelize.define('Size', {
     id: {
       field: 'id',
       type: Sequelize.INTEGER(),
@@ -14,11 +15,12 @@ module.exports = (sequelize, Sequelize) => {
     },
   }, {
     timestamps: false,
-    tableName: 'options',
+    tableName: 'sizes',
   });
 
-  Option.associate = () => {
+  Size.associate = (models) => {
+    Size.belongsToMany(models.Product, { through: models.ProductSize });
   };
 
-  return Option;
+  return Size;
 };

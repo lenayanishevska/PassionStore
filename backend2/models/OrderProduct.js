@@ -7,17 +7,24 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
-    name: {
-      field: 'name',
-      type: Sequelize.STRING(255),
+    amount: {
+      field: 'amount',
+      type: Sequelize.FLOAT,
+      allowNull: false,
+    },
+    quantity: {
+      field: 'quantity',
+      type: Sequelize.INTEGER,
       allowNull: false,
     },
   }, {
     timestamps: false,
-    tableName: 'orderproducts',
+    tableName: 'order_products',
   });
 
-  OrderProduct.associate = () => {
+  OrderProduct.associate = (models) => {
+    OrderProduct.belongsTo(models.Order);
+    OrderProduct.belongsTo(models.Product);
   };
 
   return OrderProduct;

@@ -1,5 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const ProductOption = sequelize.define('ProductOption', {
+
+  const ProductSize = sequelize.define('ProductSize', {
     id: {
       field: 'id',
       type: Sequelize.INTEGER(),
@@ -7,18 +8,18 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
-    name: {
-      field: 'name',
-      type: Sequelize.STRING(255),
+    quantity: {
+      field: 'quantity',
+      type: Sequelize.INTEGER(),
       allowNull: false,
     },
   }, {
     timestamps: false,
-    tableName: 'productoptions',
+    tableName: 'product_sizes',
   });
 
-  ProductOption.associate = () => {
+  ProductSize.associate = (models) => {
   };
 
-  return ProductOption;
+  return ProductSize;
 };
