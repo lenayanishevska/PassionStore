@@ -7,17 +7,17 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
-    name: {
-      field: 'name',
+    value: {
+      field: 'value',
       type: Sequelize.STRING(255),
       allowNull: false,
     },
   }, {
     timestamps: false,
-    tableName: 'productattributes',
+    tableName: 'product_attributes',
   });
 
-  ProductAttribute.associate = () => {
+  ProductAttribute.associate = (models) => {
   };
 
   return ProductAttribute;

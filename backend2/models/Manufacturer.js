@@ -7,12 +7,18 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
+    name: {
+      field: 'name',
+      type: Sequelize.STRING(255),
+      allowNull: false,
+    },
   }, {
     timestamps: false,
     tableName: 'manufacturers',
   });
 
-  Manufacturer.associate = () => {
+  Manufacturer.associate = (models) => {
+    Manufacturer.hasMany(models.Product);
   };
 
   return Manufacturer;

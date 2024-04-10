@@ -1,4 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
+
   const User = sequelize.define('User', {
     id: {
       field: 'id',
@@ -7,13 +8,13 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
-    firstname: {
-      field: 'firstname',
+    first_name: {
+      field: 'first_name',
       type: Sequelize.STRING(255),
       allowNull: false,
     },
-    lastname: {
-      field: 'lastname',
+    last_name: {
+      field: 'last_name',
       type: Sequelize.STRING(255),
       allowNull: false,
     },
@@ -21,18 +22,31 @@ module.exports = (sequelize, Sequelize) => {
       field: 'email',
       type: Sequelize.STRING(255),
       allowNull: false,
+      unique: true,
     },
     password: {
       field: 'password',
       type: Sequelize.STRING(255),
       allowNull: false,
     },
+    is_admin: {
+      field: 'is_admin',
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    }
   }, {
     timestamps: false,
     tableName: 'users',
   });
 
-  User.associate = () => {
+  User.associate = (models) => {
+    User.belongsTo(models.UserAddress, {
+      foreignKey: {
+        allowNull: true,
+      }
+    });
+    User.hasMany(models.Order);
   };
 
   return User;

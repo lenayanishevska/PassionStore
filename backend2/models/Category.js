@@ -1,4 +1,5 @@
-module.exports = (sequelize, Sequelize) => {
+const Sequelize = require('sequelize');
+module.exports = (sequelize) => {
   const Category = sequelize.define('Category', {
     id: {
       field: 'id',
@@ -12,12 +13,18 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING(255),
       allowNull: false,
     },
+    gender: {
+      field: 'gender',
+      type: Sequelize.ENUM('Women', 'Men'),
+      allowNull: false,
+    },
   }, {
     timestamps: false,
     tableName: 'categories',
   });
 
-  Category.associate = () => {
+  Category.associate = (models) => {
+    Category.hasMany(models.Product);
   };
 
   return Category;

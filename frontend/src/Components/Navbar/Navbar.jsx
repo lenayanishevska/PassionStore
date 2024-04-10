@@ -56,7 +56,6 @@ export const Navbar = () => {
             <div className="nav-right flex-row">
                 <img src={search} alt="" onClick={handlerLogout}/>
                 <Link to='/login'><img src={profile} alt="" /></Link>
-                <Link to='/favorite'><img src={wishlist} alt="" /></Link>
                 <Link to='/cart'><img src={parcel} alt="" /></Link>
             </div>
         </nav>
