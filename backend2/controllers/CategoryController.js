@@ -2,7 +2,15 @@ const { Category } = require('../models');
 
 class CategoryController {
   async list(req, res, next) {
-    const list = await Category.findAll({});
+    const gender = req.query.gender;
+    let list;
+
+    if(gender) {
+      list = await Category.findAll({ where: { gender} });
+    }
+    else {
+      list = await Category.findAll();
+    }
 
     return list;
   }
