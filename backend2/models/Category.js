@@ -15,9 +15,14 @@ module.exports = (sequelize) => {
     },
     gender: {
       field: 'gender',
-      type: Sequelize.ENUM('Women', 'Men'),
+      type: Sequelize.STRING(8),
       allowNull: false,
     },
+    parentCategoryId: {
+      field: 'parent_category_id',
+      type: Sequelize.INTEGER(),
+      allowNull: true,
+    }
   }, {
     timestamps: false,
     tableName: 'categories',
