@@ -7,6 +7,21 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
+    alias: {
+      field: 'alias',
+      type: Sequelize.STRING(255),
+      allowNull: false,
+    },
+    name: {
+      field: 'name',
+      type: Sequelize.STRING(255),
+      allowNull: false,
+    },
+    content: {
+      field: 'content',
+      type: Sequelize.TEXT(),
+      allowNull: false,
+    },
   }, {
     timestamps: false,
     tableName: 'pages',

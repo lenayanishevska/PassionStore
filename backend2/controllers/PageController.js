@@ -9,9 +9,27 @@ class PageController {
     return list;
   }
 
-  async create(req, res, next) {
-    const page = await Page.create({
+  async item(req, res, next) {
+    const where = {
+      alias: req.query.alias,
+    };
 
+    const item = await Page.findOne({ where });
+
+    return item;
+  }
+
+  async create(req, res, next) {
+    const { alias, name, content } = req.body;
+
+    if (!alias || !name || !content) {
+      throw new Error('Invalid input');
+    }
+
+    const page = await Page.create({
+      alias,
+      name,
+      content,
     });
 
     return page;

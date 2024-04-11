@@ -12,6 +12,7 @@ router.post("/products/create", authMiddleware, wrapAsync(productController.crea
 router.get("/categories/list", wrapAsync(categoryController.list));
 router.post("/categories/create", authMiddleware, wrapAsync(categoryController.create));
 router.get("/pages/list", wrapAsync(pageController.list));
+router.get("/pages/item", wrapAsync(pageController.item));
 router.post("/pages/create", authMiddleware, wrapAsync(pageController.create));
 
 
