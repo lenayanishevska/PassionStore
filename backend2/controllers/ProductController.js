@@ -1,4 +1,4 @@
-const { Product } = require("../models");
+const { Product, OrderProduct } = require("../models");
 
 class ProductController {
   async list(req, res, next) {
@@ -35,6 +35,43 @@ class ProductController {
     });
 
     return product;
+  }
+
+  async addToCart(req, res, next) {
+    const { productId } = req.body;
+    const userId = req.user.id;
+
+    const orderProduct = await OrderProduct.findOne({
+      where: {
+        productId,
+        userId,
+      },
+    });
+
+    if (orderProduct) {
+      throw new Error('Product alreadt in cart');
+    }
+
+    await OrderProduct.create({
+      productId,
+      userId,
+      amount: 1,
+      quantity: 1,
+    });
+
+    return true;
+  }
+
+  async cartList(req, res, next) {
+    const userId = req.user.id;
+
+    const list = await OrderProduct.findAll({
+      where: {
+        userId,
+      },
+    });
+
+    return list;
   }
 }
 

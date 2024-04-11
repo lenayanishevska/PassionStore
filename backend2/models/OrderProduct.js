@@ -7,6 +7,11 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
+    productId: {
+      field: 'product_id',
+      type: Sequelize.INTEGER(),
+      allowNull: false,
+    },
     amount: {
       field: 'amount',
       type: Sequelize.FLOAT,
@@ -15,6 +20,11 @@ module.exports = (sequelize, Sequelize) => {
     quantity: {
       field: 'quantity',
       type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    userId: {
+      field: 'user_id',
+      type: Sequelize.INTEGER(),
       allowNull: false,
     },
   }, {
