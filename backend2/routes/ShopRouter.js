@@ -6,9 +6,9 @@ const wrapAsync = require('../middleware/WrapAsync');
 
 const router = new Router();
 
-router.post("/products/list", wrapAsync(productController.list));
+router.get("/products/list", wrapAsync(productController.list));
 router.post("/products/create", authMiddleware, wrapAsync(productController.create));
-router.post("/categories/list", wrapAsync(categoryController.list));
+router.get("/categories/list", wrapAsync(categoryController.list));
 router.post("/categories/create", authMiddleware, wrapAsync(categoryController.create));
 
 module.exports = router;
