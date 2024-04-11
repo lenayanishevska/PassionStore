@@ -2,7 +2,15 @@ const { Product } = require("../models");
 
 class ProductController {
   async list(req, res, next) {
-    const list = await Product.findAll({});
+    const { categoryId } = req.query;
+
+    const where = {};
+
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    const list = await Product.findAll({ where });
 
     return list;
   }
