@@ -1,4 +1,4 @@
-const { Product, OrderProduct } = require("../models");
+const { Product, OrderProduct, Order } = require("../models");
 
 class ProductController {
   async list(req, res, next) {
@@ -57,6 +57,7 @@ class ProductController {
       userId,
       amount: 1,
       quantity: 1,
+      orderId: null,
     });
 
     return true;
@@ -68,10 +69,45 @@ class ProductController {
     const list = await OrderProduct.findAll({
       where: {
         userId,
+        orderId: null,
       },
     });
 
     return list;
+  }
+
+  async createOrder(req, res, next) {
+    const userId = req.user.id;
+
+    const orderProductList = await OrderProduct.findAll({
+      where: {
+        productId,
+        userId,
+        orderId: null,
+      },
+    });
+
+    if (!orderProductList.length) {
+      throw new Error('No products in cart');
+    }
+
+    const order = await Order.create({
+      total_amount: 1,
+      status: "Processing",
+      userId,
+    });
+
+    for (let index = 0; index < orderProductList.length; index++) {
+      await OrderProduct.update({
+        orderId: order.id,
+      }, {
+        where: {
+          id: orderProductList[index].id,
+        },
+      });
+    }
+
+    return order;
   }
 }
 
