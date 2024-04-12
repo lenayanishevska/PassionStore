@@ -5,12 +5,7 @@ export const productsApi = createApi({
     baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:5001/api/'}),
     endpoints: (build) => ({
         getProducts: build.query({
-            query: (args) => {
-                const { parentId, categoryId } = args;
-                return {
-                    url: `shop/products/list?${parentId && `parentCategoryId=${parentId}`}&${categoryId && `CategoryId=${categoryId}`}`,
-                }
-            }
+            query: ( {parentCategoryId, categoryId} ) => `shop/products/list?${parentCategoryId && `parentCategoryId=${parentCategoryId}`}&${categoryId && `CategoryId=${categoryId}`}`,
         }),
     })
 });

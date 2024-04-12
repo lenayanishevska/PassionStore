@@ -47,7 +47,7 @@
 .black {
     border: none;
     color: var(--base-color);
-    background-color: rgba(30, 30, 30, 0.9);;
+    background-color: rgba(30, 30, 30, 0.9);
 }
 
 .white {

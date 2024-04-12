@@ -21,10 +21,10 @@ function App() {
       <Navbar/>
       <Routes>
         <Route path='/' element={<Home/>}></Route>
-        <Route path="/products/:category" element={<GenderCategory />}></Route>
+        {/* <Route path="/products/:category" element={<GenderCategory />}></Route> */}
         <Route path="/products/:category/:subcategory" element={<GenderCategory />}></Route>
         <Route path='/aboutUs' element={<AboutUs/>}></Route>
-        <Route path='/products/:category/:productId' element={<ProductDetail/>}></Route>
+        <Route path='/products/:category/:subcategory/:productId' element={<ProductDetail/>}></Route>
 
         <Route path='/cart' element={<Cart/>}></Route>
         <Route path='/login' element={user ? <Profile /> : <Login/>} ></Route>

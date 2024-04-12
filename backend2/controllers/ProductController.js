@@ -1,30 +1,27 @@
 const Joi = require('joi');
+const uuid = require('uuid');
+const path = require('path');
 const { Product, OrderProduct, Order, Attribute, Option, OptionValue, Category } = require("../models");
 
 class ProductController {
   async list(req, res, next) {
     const querySchema = Joi.object({
       parentCategoryId: Joi.number(),
-      categoryId: Joi.number(),
+      CategoryId: Joi.number(),
     });
 
-    const { parentCategoryId, categoryId } = await querySchema.validateAsync(req.query);
+    const { parentCategoryId, CategoryId } = await querySchema.validateAsync(req.query);
   
     const where = {};
 
-    if (!categoryId) {
+    if (!CategoryId) {
       const categories = await Category.findAll({ where: { parentCategoryId } });
       const categoryIds = categories.map(category => category.id);
-      where.categoryId = categoryIds;
+      where.CategoryId = categoryIds;
     }
     else {
-      where.CategoryId = categoryId;
+      where.CategoryId = CategoryId;
     }
-    
-
-    // if (categoryId) {
-    //   where.categoryId = categoryId;
-    // }
 
     const list = await Product.findAll({ where });
 
@@ -37,17 +34,27 @@ class ProductController {
       description: Joi.string().required(),
       price: Joi.number().required(),
       SKU: Joi.string().required(),
-      image_url: Joi.string().required(),
+      CategoryId: Joi.number().required(),
+      ManufacturerId: Joi.number().required(),
     });
 
-    const { name, description, price, SKU, image_url } = await bodySchema.validateAsync(req.body);
+    const { name, description, price, SKU, CategoryId, ManufacturerId} = await bodySchema.validateAsync(req.body);
+    const {image_url} = req.files;
+    console.log(req.files);
+    let fileName = uuid.v4() + ".jpg";
+    console.log(fileName);
+    console.log(__dirname);
+    image_url.mv(path.resolve(__dirname, '..', 'static', fileName));
+
 
     const product = await Product.create({
       name,
       description,
       price,
       SKU,
-      image_url,
+      image_url: fileName,
+      CategoryId,
+      ManufacturerId
     });
 
     return product;
