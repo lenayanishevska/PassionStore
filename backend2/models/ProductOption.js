@@ -7,9 +7,9 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
-    value: {
-      field: 'value',
-      type: Sequelize.STRING(255),
+    optionValueId: {
+      field: 'option_value_id',
+      type: Sequelize.INTEGER(),
       allowNull: false,
     },
   }, {

@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { Product, OrderProduct, Order, Attribute } = require("../models");
+const { Product, OrderProduct, Order, Attribute, Option, OptionValue } = require("../models");
 
 class ProductController {
   async list(req, res, next) {
@@ -153,15 +153,23 @@ class ProductController {
   async createOption(req, res, next) {
     const bodySchema = Joi.object({
       name: Joi.string().required(),
+      values: Joi.array().items(Joi.string()),
     });
 
-    const { name } = await bodySchema.validateAsync(req.body);
+    const { name, values } = await bodySchema.validateAsync(req.body);
 
-    const attribute = await Attribute.create({
+    const option = await Option.create({
       name,
     });
 
-    return attribute;
+    for (let index = 0; index < values.length; index++) {
+      await OptionValue.create({
+        optionId: option.id,
+        value: values[index],
+      });
+    }
+
+    return option;
   }
 }
 

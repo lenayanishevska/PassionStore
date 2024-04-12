@@ -18,5 +18,7 @@ router.get("/pages/list", wrapAsync(pageController.list));
 router.get("/pages/item", wrapAsync(pageController.item));
 router.post("/pages/create", authMiddleware, wrapAsync(pageController.create));
 
+router.post("/attributes/create", authMiddleware, wrapAsync(pageController.createAttribute));
+router.post("/options/create", authMiddleware, wrapAsync(pageController.createOption));
 
 module.exports = router;
