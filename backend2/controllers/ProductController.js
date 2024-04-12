@@ -1,9 +1,14 @@
-const { Product, OrderProduct, Order } = require("../models");
+const Joi = require('joi');
+const { Product, OrderProduct, Order, Attribute } = require("../models");
 
 class ProductController {
   async list(req, res, next) {
-    const { categoryId } = req.query;
+    const querySchema = Joi.object({
+      categoryId: Joi.number(),
+    });
 
+    const { categoryId } = await querySchema.validateAsync(req.query);
+  
     const where = {};
 
     if (categoryId) {
@@ -16,15 +21,15 @@ class ProductController {
   }
 
   async create(req, res, next) {
-    const name = req.body.name;
-    const description = req.body.description;
-    const price = req.body.price;
-    const SKU = req.body.SKU;
-    const image_url = req.body.image_url;
+    const bodySchema = Joi.object({
+      name: Joi.string().required(),
+      description: Joi.string().required(),
+      price: Joi.number().required(),
+      SKU: Joi.string().required(),
+      image_url: Joi.string().required(),
+    });
 
-    if (!name || !gender) {
-      throw new Error("Invalid data");
-    }
+    const { name, description, price, SKU, image_url } = await bodySchema.validateAsync(req.body);
 
     const product = await Product.create({
       name,
@@ -38,8 +43,23 @@ class ProductController {
   }
 
   async addToCart(req, res, next) {
-    const { productId } = req.body;
+    const bodySchema = Joi.object({
+      productId: Joi.number().required(),
+    });
+
+    const { productId } = await bodySchema.validateAsync(req.body);
+
     const userId = req.user.id;
+
+    const product = await Product.findOne({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
 
     const orderProduct = await OrderProduct.findOne({
       where: {
@@ -49,16 +69,23 @@ class ProductController {
     });
 
     if (orderProduct) {
-      throw new Error('Product alreadt in cart');
+      await OrderProduct.update({
+        quantity: orderProduct.quantity + 1,
+        amount: product.amount * (orderProduct.quantity + 1),
+      }, {
+        where: {
+          id: orderProduct.id,
+        },
+      });
+    } else {
+      await OrderProduct.create({
+        productId,
+        userId,
+        amount: product.amount,
+        quantity: 1,
+        orderId: null,
+      });
     }
-
-    await OrderProduct.create({
-      productId,
-      userId,
-      amount: 1,
-      quantity: 1,
-      orderId: null,
-    });
 
     return true;
   }
@@ -79,15 +106,14 @@ class ProductController {
   async createOrder(req, res, next) {
     const userId = req.user.id;
 
-    const orderProductList = await OrderProduct.findAll({
+    const orderProductList = await OrderProduct.findOne({
       where: {
-        productId,
         userId,
         orderId: null,
       },
     });
 
-    if (!orderProductList.length) {
+    if (orderProductList) {
       throw new Error('No products in cart');
     }
 
@@ -108,6 +134,34 @@ class ProductController {
     }
 
     return order;
+  }
+
+  async createAttribute(req, res, next) {
+    const bodySchema = Joi.object({
+      name: Joi.string().required(),
+    });
+
+    const { name } = await bodySchema.validateAsync(req.body);
+
+    const attribute = await Attribute.create({
+      name,
+    });
+
+    return attribute;
+  }
+
+  async createOption(req, res, next) {
+    const bodySchema = Joi.object({
+      name: Joi.string().required(),
+    });
+
+    const { name } = await bodySchema.validateAsync(req.body);
+
+    const attribute = await Attribute.create({
+      name,
+    });
+
+    return attribute;
   }
 }
 

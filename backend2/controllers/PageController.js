@@ -34,6 +34,39 @@ class PageController {
 
     return page;
   }
+
+  async update(req, res, next) {
+    const bodySchema = Joi.object({
+      id: Joi.number().required(),
+      alias: Joi.string().required(),
+      name: Joi.string().required(),
+      content: Joi.string().required(),
+    });
+
+    const { id } = await bodySchema.validateAsync(req.body);
+
+    let page = await Page.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!page) {
+      throw new Error('Page not found');
+    }
+
+    page = await Page.update({
+      alias,
+      name,
+      content,
+    }, {
+      where: {
+        id,
+      },
+    });
+    
+    return page;
+  }
 }
 
 module.exports = new PageController();
