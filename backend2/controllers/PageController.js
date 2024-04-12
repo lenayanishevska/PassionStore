@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const { Page } = require("../models");
 
 class PageController {
@@ -10,8 +11,14 @@ class PageController {
   }
 
   async item(req, res, next) {
+    const querySchema = Joi.object({
+      alias: Joi.string().required(),
+    });
+
+    const { alias } = await querySchema.validateAsync(req.query);
+
     const where = {
-      alias: req.query.alias,
+      alias,
     };
 
     const item = await Page.findOne({ where });

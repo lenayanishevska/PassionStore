@@ -12,9 +12,11 @@ router.post("/products/addProductToCart", authMiddleware, wrapAsync(productContr
 router.get("/products/cartProductList", authMiddleware, wrapAsync(productController.cartList));
 router.get("/products/createOrder", authMiddleware, wrapAsync(productController.createOrder));
 router.post("/products/create", authMiddleware, wrapAsync(productController.create));
+
 router.get("/categories/list", wrapAsync(categoryController.list));2
 router.post("/categories/create", authMiddleware, wrapAsync(categoryController.create));
-router.get("/pages/list", wrapAsync(pageController.list));
+
+router.get("/pages/list", authMiddleware, wrapAsync(pageController.list));
 router.get("/pages/item", wrapAsync(pageController.item));
 router.post("/pages/create", authMiddleware, wrapAsync(pageController.create));
 
