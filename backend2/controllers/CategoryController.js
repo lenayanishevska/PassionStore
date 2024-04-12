@@ -2,16 +2,15 @@ const { Category } = require('../models');
 
 class CategoryController {
   async list(req, res, next) {
-    const { gender, parentCategoryId } = req.query;
+    const { parentCategoryId } = req.query;
 
     const where = {};
 
-    if (gender) {
-      where.gender = gender;
-    }
-
     if (parentCategoryId) {
       where.parentCategoryId = parentCategoryId;
+    }
+    else {
+      where.parentCategoryId = null;
     }
 
     const list = await Category.findAll({ where });
@@ -21,16 +20,16 @@ class CategoryController {
 
   async create(req, res, next) {
     const name = req.body.name;
-    const gender = req.body.gender;
+    const parentCategoryId = req.body.parentCategoryId;
+    // const gender = req.body.gender;
 
-    if (!name || !gender) {
+    if (!name) {
       throw new Error('Invalid data');
     }
 
     const category = await Category.create({
       name,
-      gender,
-      parentCategoryId: null,
+      parentCategoryId,
     });
 
     return category;

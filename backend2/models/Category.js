@@ -13,11 +13,6 @@ module.exports = (sequelize) => {
       type: Sequelize.STRING(255),
       allowNull: false,
     },
-    gender: {
-      field: 'gender',
-      type: Sequelize.STRING(8),
-      allowNull: false,
-    },
     parentCategoryId: {
       field: 'parent_category_id',
       type: Sequelize.INTEGER(),
