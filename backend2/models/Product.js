@@ -19,11 +19,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      categoryId: {
-        field: "category_id",
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
       price: {
         field: "price",
         type: Sequelize.FLOAT,

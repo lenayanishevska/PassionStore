@@ -1,9 +1,13 @@
 import { combineReducers, configureStore} from "@reduxjs/toolkit";
 import * as user from './Reducers/UserReducer';
+import { categoriesApi } from "./Api/CategoriesApi";
+import { productsApi } from "./Api/ProductsApi";
 
 const rootReducer = combineReducers({
     userLogin : user.LoginReducer,
-    userRegister: user.RegisterReducer
+    userRegister: user.RegisterReducer,
+    [categoriesApi.reducerPath]: categoriesApi.reducer,
+    [productsApi.reducerPath]: productsApi.reducer,
 });
 
 const userInfoFromStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
@@ -19,5 +23,5 @@ export const store = configureStore({
         getDefaultMiddleware({
             serializableCheck:false,
             immutableCheck: false,
-        }),
+        }).concat(categoriesApi.middleware, productsApi.middleware),
 });

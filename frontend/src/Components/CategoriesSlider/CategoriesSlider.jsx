@@ -1,13 +1,14 @@
 import React from 'react'
 import './CategoriesSlider.css'
-import {categories} from '../../data.js'
+// import {categories} from '../../data.js'
 import Category from '../Category/Category.jsx'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import { Link } from 'react-router-dom';
 
 
-export default function CategoriesSlider() {
+export default function CategoriesSlider({subcategories}) {
     var settings = {
         dots: true,
         infinite: true,
@@ -19,9 +20,9 @@ export default function CategoriesSlider() {
     <div className="slider-container">
         <div className='slider'>
             <Slider {...settings}>
-                {categories.map((e, index) => {
+                {subcategories.map((item) => {
                     return (
-                        <Category key={index} name={e.name}/>
+                        <Link key={item.id} to={`/products/${item.parentCategoryId}/${item.id}`}><Category name={item.name}/></Link>
                     )
                 })}
             </Slider>

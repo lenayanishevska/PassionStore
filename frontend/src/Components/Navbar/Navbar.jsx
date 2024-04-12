@@ -7,16 +7,18 @@ import { useDispatch} from 'react-redux';
 import { UpperNavBar } from '../UpperNavBar/UpperNavBar'
 import search from '../../assets/icons/search.png'
 import profile from '../../assets/icons/profile.png'
-import wishlist from '../../assets/icons/wishlist.png'
 import parcel from '../../assets/icons/parcel.png'
 import { DropDownMenu } from '../DropdownMenu/DropDownMenu'
 import { logoutAction } from '../../redux/Actions/UserActions'
 import toast from 'react-hot-toast';
+import { useGetCategoriesQuery } from '../../redux/Api/CategoriesApi';
 
 export const Navbar = () => {
     const [menu,setMenu] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const {data} = useGetCategoriesQuery();
+    const categories = data ? data.data : [];
 
     const handlerLogout = () => {
         dispatch(logoutAction());
@@ -33,16 +35,13 @@ export const Navbar = () => {
         <UpperNavBar />
         <nav className="navbar flex-div">
             <div className="nav-left flex-row">
-                <h2 onMouseEnter={() => setMenu("women")} 
-                    onMouseLeave={() => setMenu("")} 
-                    onClick={() => setMenu("women")}>
-                    <Link to='/products/women'>Women</Link> {menu === "women"?<hr/>: <></>} 
-                </h2>
-                <h2 onMouseEnter={() => setMenu("men")} 
-                    onMouseLeave={() => setMenu("")} 
-                    onClick={() => {setMenu("men")}}>
-                    <Link to='products/men'>Men</Link> {menu === "men"?<hr/>: <></>}
-                </h2>
+                {categories.map((item) => {
+                    return (
+                        <h2 key={item.id} onClick={() => setMenu(item.name)}>
+                            <Link to={`/products/${item.id}`}>{item.name}</Link> {menu === item.name?<hr/>: <></>} 
+                        </h2>
+                    )
+                })}
 
                 <h2 onClick={() => {setMenu("aboutUs")}}>
                     <Link to='/aboutUs'>About us</Link> {menu === "aboutUs"?<hr/>: <></>}

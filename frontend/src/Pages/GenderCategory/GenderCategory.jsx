@@ -1,18 +1,28 @@
 import React from 'react'
 import './GenderCategory.css'
 import CategoriesSlider from '../../Components/CategoriesSlider/CategoriesSlider'
-import { useLocation } from "react-router";
+import { useParams } from "react-router-dom";
 import Products from '../../Components/Products/Products';
+import { useGetCategoriesQuery } from '../../redux/Api/CategoriesApi';
 
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { brown, grey } from '@mui/material/colors';
+import { useGetProductsQuery } from '../../redux/Api/ProductsApi';
 
 export const GenderCategory = () => {
-  const location = useLocation();
-  const cat = location.pathname.split("/")[2];
-  const header = cat === 'women'? 'Women\'s' : 'Man\'s';
+  const {category, subcategory} = useParams();
+  console.log(category, subcategory);
+
+  const {data} = useGetCategoriesQuery(category);
+  const subcategories = data ? data.data : [];
+  const header = category === '1'? 'Men\'s': 'Women\'s';
+
+  const {productsData} = useGetProductsQuery({parentId: category, categoryId: subcategory});
+  const products = productsData ? productsData.data : [];
+
+  console.log(products);
 
   const materials = [{name: 'Cotton'}, {name:'Jeans'}, {name:'Silk'}, {name:'Wool'}, {name:'Leather'}, {name:'Cashemire'}];
   const sizes = [{name: 'XS'}, {name:'S'}, {name:'M'}, {name:'L'}, {name:'XL'}];
@@ -20,7 +30,7 @@ export const GenderCategory = () => {
 
   return (
     <div className='catalog-page'>
-      <CategoriesSlider/>
+      <CategoriesSlider subcategories={subcategories}/>
       <div className="main-content flex-row">
         <div className="filters-container flex-column">
           <div className="filters flex-column">
@@ -82,7 +92,7 @@ export const GenderCategory = () => {
             </div>
           </div>
           <div className="products-list">
-            <Products cat={cat}/>
+            <Products products={products}/>
           </div>
         </div>
       </div>

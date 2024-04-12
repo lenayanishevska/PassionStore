@@ -1,10 +1,11 @@
 import React from 'react'
 import './Products.css'
-import {products} from '../../data.js'
+// import {products} from '../../data.js'
 import Product from '../Product/Product.jsx'
 import { Link } from 'react-router-dom'
 
-export default function Products({cat}) {
+export default function Products({products}) {
+  
   return (
     <div className='products-grid'>
         {products.map((item) => {
