@@ -1,19 +1,30 @@
 const Joi = require('joi');
-const { Product, OrderProduct, Order, Attribute, Option, OptionValue } = require("../models");
+const { Product, OrderProduct, Order, Attribute, Option, OptionValue, Category } = require("../models");
 
 class ProductController {
   async list(req, res, next) {
     const querySchema = Joi.object({
+      parentCategoryId: Joi.number(),
       categoryId: Joi.number(),
     });
 
-    const { categoryId } = await querySchema.validateAsync(req.query);
+    const { parentCategoryId, categoryId } = await querySchema.validateAsync(req.query);
   
     const where = {};
 
-    if (categoryId) {
-      where.categoryId = categoryId;
+    if (!categoryId) {
+      const categories = await Category.findAll({ where: { parentCategoryId } });
+      const categoryIds = categories.map(category => category.id);
+      where.categoryId = categoryIds;
     }
+    else {
+      where.CategoryId = categoryId;
+    }
+    
+
+    // if (categoryId) {
+    //   where.categoryId = categoryId;
+    // }
 
     const list = await Product.findAll({ where });
 
