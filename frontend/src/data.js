@@ -243,4 +243,30 @@ const products = [
 
 ]
 
-export { categories, products };
+const cartProducts = [
+    {
+        id: 1,
+        name: 'Ribbed Tank Top',
+        price: '9.99',
+        quantity: 2,
+        total: '19.98'
+    },
+    {
+        id: 2,
+        name: 'Plissé Dress',
+        price: '34.99',
+        quantity: 1,
+        total: '34.99'
+    },
+    {
+        id: 3,
+        name: 'Gathered Midi Dress',
+        price: '26.99',
+        quantity: 1,
+        total: '26.99'
+    },
+    
+
+]
+
+export { categories, products, cartProducts };

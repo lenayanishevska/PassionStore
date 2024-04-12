@@ -38,7 +38,7 @@ export const Navbar = () => {
                 {categories.map((item) => {
                     return (
                         <h2 key={item.id} onClick={() => setMenu(item.name)}>
-                            <Link to={`/products/${item.id}`}>{item.name}</Link> {menu === item.name?<hr/>: <></>} 
+                            <Link to={`/products/${item.id}/0`}>{item.name}</Link> {menu === item.name?<hr/>: <></>} 
                         </h2>
                     )
                 })}

@@ -1,5 +1,6 @@
-const path = require("path");
 const dotenv = require("dotenv");
+const fileUpload = require('express-fileupload');
+const path = require('path');
 
 dotenv.config({
   path: path.join(__dirname, ".env"),
@@ -15,6 +16,10 @@ const PORT = process.env.PORT || 5001;
 const app = express();
 app.use(cors());
 app.use(express.json());
+console.log(__dirname);
+app.use(fileUpload({}));
+
+app.use(express.static(path.resolve(__dirname, 'static')));
 
 app.use("/api", router);
 

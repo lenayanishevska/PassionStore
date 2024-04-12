@@ -9,7 +9,6 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { brown, grey } from '@mui/material/colors';
-import { useGetProductsQuery } from '../../redux/Api/ProductsApi';
 
 export const GenderCategory = () => {
   const {category, subcategory} = useParams();
@@ -18,11 +17,6 @@ export const GenderCategory = () => {
   const {data} = useGetCategoriesQuery(category);
   const subcategories = data ? data.data : [];
   const header = category === '1'? 'Men\'s': 'Women\'s';
-
-  const {productsData} = useGetProductsQuery({parentId: category, categoryId: subcategory});
-  const products = productsData ? productsData.data : [];
-
-  console.log(products);
 
   const materials = [{name: 'Cotton'}, {name:'Jeans'}, {name:'Silk'}, {name:'Wool'}, {name:'Leather'}, {name:'Cashemire'}];
   const sizes = [{name: 'XS'}, {name:'S'}, {name:'M'}, {name:'L'}, {name:'XL'}];
@@ -92,7 +86,7 @@ export const GenderCategory = () => {
             </div>
           </div>
           <div className="products-list">
-            <Products products={products}/>
+            <Products category={category} subcategory={subcategory}/>
           </div>
         </div>
       </div>
