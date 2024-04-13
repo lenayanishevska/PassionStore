@@ -40,10 +40,7 @@ class ProductController {
 
     const { name, description, price, SKU, CategoryId, ManufacturerId} = await bodySchema.validateAsync(req.body);
     const {image_url} = req.files;
-    console.log(req.files);
     let fileName = uuid.v4() + ".jpg";
-    console.log(fileName);
-    console.log(__dirname);
     image_url.mv(path.resolve(__dirname, '..', 'static', fileName));
 
 
