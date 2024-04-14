@@ -7,6 +7,7 @@ const { Product, OrderProduct, Order, Attribute, Option, OptionValue, Category, 
 
 class ProductController {
   async list(req, res, next) {
+    console.log("PArams>>>>> ", req.query);
     const querySchema = Joi.object({
       parentCategoryId: Joi.number(),
       sort: Joi.string().optional(),

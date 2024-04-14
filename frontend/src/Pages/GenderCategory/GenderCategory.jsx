@@ -8,18 +8,32 @@ import { useGetCategoriesQuery } from '../../redux/Api/CategoriesApi';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Slider from '@mui/material/Slider';
+import Box from '@mui/material/Box';
 import { brown, grey } from '@mui/material/colors';
 
 export const GenderCategory = () => {
   const [sortField, setSortField] = useState('name');
   const [sortOrder, setSortOrder] = useState('ASC');
-  const [clothCategory, setClothCategory] = useState();
+  const [CategoryId, setCategoryId] = useState();
   const [manufacturer, setManufacturer] = useState();
   const [fromPrice, setFromPrice] = useState();
   const [toPrice, setToPrice] = useState();
+  const [filterParams, setFilterParams] = useState({});
   const {category, subcategory} = useParams();
+  const [value, setValue] = useState([1, 100]);
 
-  console.log("Cloth Category ", clothCategory);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+    setFromPrice(parseFloat(value[0]));
+    setToPrice(parseFloat(value[1]));
+    setFilterParams(prevParams => ({
+      ...prevParams,
+      fromPrice: parseFloat(value[0]),
+      toPrice: parseFloat(value[1]),
+    }));
+  };
+
 
   const {data} = useGetCategoriesQuery(category);
   const subcategories = data ? data.data : [];
@@ -28,17 +42,9 @@ export const GenderCategory = () => {
     sortField: sortField,
     sortOrder: sortOrder,
   }
-
-  const filterParams = {
-    clothCategory: clothCategory,
-    manufacturer: manufacturer,
-    fromPrice: fromPrice,
-    toPrice: toPrice,
-  }
-
+  
   const productParams = {
     category: category,
-    subcategory: subcategory,
     sortParams: sortParams,
     filterParams: filterParams,
   };
@@ -46,12 +52,12 @@ export const GenderCategory = () => {
   const header = category === '1'? 'Men\'s': 'Women\'s';
 
   const materials = [{name: 'Cotton'}, {name:'Jeans'}, {name:'Silk'}, {name:'Wool'}, {name:'Leather'}, {name:'Cashemire'}];
-  const sizes = [{name: 'XS'}, {name:'S'}, {name:'M'}, {name:'L'}, {name:'XL'}];
+  const brands = [{name: 'Zara'}, {name:'H&M'}, {name:'Mango'}, {name:'Bershka'}, {name:'Reserved'}];
   const prices = [{name: '$5 - $10'}, {name:'$10 - $50'}, {name:'$50 - $100'}, {name:'$100 - $500'}, {name:'$500 - ...'}];
 
   return (
     <div className='catalog-page'>
-      <CategoriesSlider subcategories={subcategories} setClothCategory={setClothCategory}/>
+      <CategoriesSlider subcategories={subcategories} setCategoryId={setCategoryId} setFilterParams={setFilterParams}/>
       <div className="main-content flex-row">
         <div className="filters-container flex-column">
           <div className="filters flex-column">
@@ -72,32 +78,40 @@ export const GenderCategory = () => {
           <div className="filters flex-column">
             <h3>Brands</h3>
             <FormGroup>
-              {sizes.map((item, index) => {
+              {brands.map((item, index) => {
                 return (
                   <FormControlLabel key={index} sx={{ color: grey[800] }} control={<Checkbox sx={{
                     color: brown[600],
                     '&.Mui-checked': {
                       color: brown[400],
                     },
-                  }}/>} label={item.name}/>
+                  }}/>} 
+                  checked={manufacturer === item.name} 
+                  onChange={(e) => {
+                    setManufacturer(item.name);
+                    setFilterParams(prevParams => ({
+                      ...prevParams,
+                      manufacturer: !item.name ? null : item.name
+                    }));
+                  }}
+                  label={item.name}/>
                 )
               })}
             </FormGroup>
           </div>
           <div className="filters flex-column">
             <h3>Prices</h3>
-            <FormGroup>
-              {prices.map((item, index) => {
-                return (
-                  <FormControlLabel key={index} sx={{ color: grey[800] }} control={<Checkbox sx={{
-                    color: brown[600],
-                    '&.Mui-checked': {
-                      color: brown[400],
-                    },
-                  }}/>} label={item.name}/>
-                )
-              })}
-            </FormGroup>
+            <Box sx={{ width: 300 }}>
+              <Slider
+                getAriaLabel={() => 'Price range'}
+                value={value}
+                onChange={handleChange}
+                valueLabelDisplay="auto"
+                // getAriaValueText={valuetext}
+                min={1} // Мінімальне значення
+                max={1000} // Максимальне значення
+              />
+            </Box>
           </div>
         </div>
         <div className="catalog flex-column">
