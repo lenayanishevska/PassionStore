@@ -1,29 +1,58 @@
 const Joi = require('joi');
 const uuid = require('uuid');
 const path = require('path');
-const { Product, OrderProduct, Order, Attribute, Option, OptionValue, Category } = require("../models");
+const { Op } = require("sequelize");
+
+const { Product, OrderProduct, Order, Attribute, Option, OptionValue, Category, Manufacturer } = require("../models");
 
 class ProductController {
   async list(req, res, next) {
     const querySchema = Joi.object({
       parentCategoryId: Joi.number(),
-      CategoryId: Joi.number(),
+      sort: Joi.string().optional(),
+      filter: Joi.string().optional(),
     });
 
-    const { parentCategoryId, CategoryId } = await querySchema.validateAsync(req.query);
-  
+    const { parentCategoryId, sort, filter} = await querySchema.validateAsync(req.query);
+
+    console.log("Filter string ....................",filter)
+
     const where = {};
 
-    if (!CategoryId) {
+    if (parentCategoryId) {
       const categories = await Category.findAll({ where: { parentCategoryId } });
       const categoryIds = categories.map(category => category.id);
       where.CategoryId = categoryIds;
     }
-    else {
-      where.CategoryId = CategoryId;
+
+    if(filter) {
+      const { CategoryId, manufacturer, fromPrice, toPrice } = JSON.parse(filter); // Витягуємо параметри фільтру з об'єкта filter
+
+      if(CategoryId) {
+        where.CategoryId = CategoryId; // Додаємо умову для категорії одягу
+      }
+      if(manufacturer) {
+        // Отримуємо ідентифікатор виробника за його іменем з іншої таблички Manufacturer
+        const manufacturerInstance = await Manufacturer.findOne({ where: { name: manufacturer } });
+        console.log("Manufacturer: ", manufacturerInstance.id)
+        if(manufacturerInstance) {
+          where.ManufacturerId = manufacturerInstance.id; // Додаємо умову для ідентифікатора виробника
+        }
+      }
+      if(fromPrice && toPrice) {
+        where.price = { [Op.between]: [fromPrice, toPrice] }; // Додаємо умову для ціни в межах від fromPrice до toPrice
+      }
     }
 
-    const list = await Product.findAll({ where });
+    console.log("Filters ................", where);
+
+    let order = [];
+    if (sort) { // Якщо переданий параметр сортування, додати його до умови сортування
+        const { sortField, sortOrder } = JSON.parse(sort);
+        order = [[sortField, sortOrder]];
+    }
+
+    const list = await Product.findAll({ where, order });
 
     return list;
   }
@@ -56,6 +85,55 @@ class ProductController {
 
     return product;
   }
+
+  async getById(req, res, next) {
+    const querySchema = Joi.object({
+      productId: Joi.number(),
+    });
+
+    const { productId } = await querySchema.validateAsync(req.query);
+
+    const product = await Product.findOne({
+      where: {
+        id: productId,
+      },
+      include: [
+        {
+          model: Category
+        },
+        {
+          model: Manufacturer
+        },
+      ],
+    });
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    return product;
+  }
+
+  async sortedList(req, res, next) {
+    const querySchema = Joi.object({
+      sortField: Joi.string(),
+      sortOrder: Joi.string(),
+    });
+
+    const { sortField, sortOrder } = await querySchema.validateAsync(req.query);
+
+    try {
+        const products = await Product.findAll({
+            order: [[sortField, sortOrder]], // sortField - поле для сортування, sortOrder - 'ASC' або 'DESC'
+        });
+        return products;
+    } catch (error) {
+        console.error('Error fetching sorted products:', error);
+        throw error;
+    }
+  }
+
+  
 
   async addToCart(req, res, next) {
     const bodySchema = Joi.object({
