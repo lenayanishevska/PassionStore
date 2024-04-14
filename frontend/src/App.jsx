@@ -9,11 +9,10 @@ import { Cart } from './Pages/Cart/Cart'
 import { Login } from './Pages/Login/Login'
 import { Registration } from './Pages/Registration/Registration'
 import { Profile } from './Pages/Profile/Profile'
-import { Admin } from './Pages/Admin/Admin'
+import { Admin } from './Pages/Admin/Admin';
+import { Page } from './Pages/Page';
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <div>
       <BrowserRouter>
@@ -29,6 +28,7 @@ function App() {
         <Route path='/profile' element={<Profile/>} ></Route>
         <Route path='/registration' element={ <Registration/>}></Route>
         <Route path='/admin' element={ <Admin/>}></Route>
+        <Route path='/pages/:alias' element={<Page/>}></Route>
 
       </Routes>
       </BrowserRouter>
