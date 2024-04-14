@@ -15,23 +15,23 @@ import { brown, grey } from '@mui/material/colors';
 export const GenderCategory = () => {
   const [sortField, setSortField] = useState('name');
   const [sortOrder, setSortOrder] = useState('ASC');
-  const [CategoryId, setCategoryId] = useState();
   const [manufacturer, setManufacturer] = useState();
-  const [fromPrice, setFromPrice] = useState();
-  const [toPrice, setToPrice] = useState();
   const [filterParams, setFilterParams] = useState({});
-  const {category, subcategory} = useParams();
+  const {category} = useParams();
   const [value, setValue] = useState([1, 100]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-    setFromPrice(parseFloat(value[0]));
-    setToPrice(parseFloat(value[1]));
     setFilterParams(prevParams => ({
       ...prevParams,
       fromPrice: parseFloat(value[0]),
       toPrice: parseFloat(value[1]),
     }));
+  };
+
+  const handleReset = () => {
+    setFilterParams({});
+    setManufacturer(null);
   };
 
 
@@ -42,7 +42,7 @@ export const GenderCategory = () => {
     sortField: sortField,
     sortOrder: sortOrder,
   }
-  
+
   const productParams = {
     category: category,
     sortParams: sortParams,
@@ -57,24 +57,9 @@ export const GenderCategory = () => {
 
   return (
     <div className='catalog-page'>
-      <CategoriesSlider subcategories={subcategories} setCategoryId={setCategoryId} setFilterParams={setFilterParams}/>
+      <CategoriesSlider subcategories={subcategories} setFilterParams={setFilterParams}/>
       <div className="main-content flex-row">
         <div className="filters-container flex-column">
-          <div className="filters flex-column">
-            <h3>Materials</h3>
-            <FormGroup>
-              {materials.map((item, index) => {
-                return (
-                  <FormControlLabel key={index} sx={{ color: grey[800] }} control={<Checkbox sx={{
-                    color: brown[600],
-                    '&.Mui-checked': {
-                      color: brown[400],
-                    },
-                  }}/>} label={item.name}/>
-                )
-              })}
-            </FormGroup>
-          </div>
           <div className="filters flex-column">
             <h3>Brands</h3>
             <FormGroup>
@@ -113,6 +98,7 @@ export const GenderCategory = () => {
               />
             </Box>
           </div>
+          <button onClick={handleReset}>Reset</button>
         </div>
         <div className="catalog flex-column">
           <div className="catalog-header flex-row">

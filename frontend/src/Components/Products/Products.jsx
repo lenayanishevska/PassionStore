@@ -12,10 +12,6 @@ export default function Products({params}) {
     return Object.keys(obj).length === 0;
   };
 
-  console.log(isEmpty(filterParams));
-  console.log(filterParams);
-  console.log(JSON.stringify(filterParams));
-
   const { data, isLoading, isError } = useGetProductsQuery({parentCategoryId: category, sortParams: sortParams, filterParams: filterParams});
 
   console.log(data);

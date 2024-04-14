@@ -7,7 +7,7 @@ import Slider from "react-slick";
 import { Link } from 'react-router-dom';
 
 
-export default function CategoriesSlider({subcategories, setCategoryId, setFilterParams}) {
+export default function CategoriesSlider({subcategories,setFilterParams}) {
     const [isClicked, setIsClicked] = useState('');
 
     var settings = {
@@ -24,17 +24,8 @@ export default function CategoriesSlider({subcategories, setCategoryId, setFilte
             <Slider {...settings}>
                 {subcategories.map((item) => {
                     return (
-                        // <Link key={item.id} to={`/products/${item.parentCategoryId}/${item.id}`}>
-                        //     <div className='category-item center-flex' onClick={() => {
-                        //         setCategoryId(item.id);
-                        //         setIsClicked(item.name);
-                        //         }}>
-                        //         <h3>{item.name} {isClicked === item.name? <hr/>: <></>}</h3>
-                        //     </div>
-                        // </Link>
 
                         <div key={item.id} className='category-item center-flex' onClick={() => {
-                            setCategoryId(item.id);
                             setIsClicked(item.name);
                             setFilterParams(prevParams => ({
                                 ...prevParams,
