@@ -7,10 +7,8 @@ import Slider from "react-slick";
 import { Link } from 'react-router-dom';
 
 
-export default function CategoriesSlider({subcategories, setClothCategory}) {
+export default function CategoriesSlider({subcategories, setCategoryId, setFilterParams}) {
     const [isClicked, setIsClicked] = useState('');
-
-    console.log("IsClicked: ",isClicked);
 
     var settings = {
         dots: true,
@@ -26,14 +24,25 @@ export default function CategoriesSlider({subcategories, setClothCategory}) {
             <Slider {...settings}>
                 {subcategories.map((item) => {
                     return (
-                        <Link key={item.id} to={`/products/${item.parentCategoryId}/${item.id}`}>
-                            <div className='category-item center-flex' onClick={() => {
-                                setClothCategory(item.name);
-                                setIsClicked(item.name);
-                                }}>
-                                <h3>{item.name} {isClicked === item.name? <hr/>: <></>}</h3>
-                            </div>
-                        </Link>
+                        // <Link key={item.id} to={`/products/${item.parentCategoryId}/${item.id}`}>
+                        //     <div className='category-item center-flex' onClick={() => {
+                        //         setCategoryId(item.id);
+                        //         setIsClicked(item.name);
+                        //         }}>
+                        //         <h3>{item.name} {isClicked === item.name? <hr/>: <></>}</h3>
+                        //     </div>
+                        // </Link>
+
+                        <div key={item.id} className='category-item center-flex' onClick={() => {
+                            setCategoryId(item.id);
+                            setIsClicked(item.name);
+                            setFilterParams(prevParams => ({
+                                ...prevParams,
+                                CategoryId: !item.id ? null : item.id
+                              }));
+                            }}>
+                            <h3>{item.name} {isClicked === item.name? <hr/>: <></>}</h3>
+                        </div>
                     )
                 })}
             </Slider>

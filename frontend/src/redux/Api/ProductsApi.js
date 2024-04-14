@@ -5,11 +5,13 @@ export const productsApi = createApi({
     baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:5001/api/'}),
     endpoints: (build) => ({
         getProducts: build.query({
-            query: ({ parentCategoryId, categoryId, sortParams }) => {
+            query: ({ parentCategoryId, sortParams, filterParams }) => {
                 let queryString = `shop/products/list?`;
                 if (parentCategoryId) queryString += `parentCategoryId=${parentCategoryId}&`;
-                if (categoryId) queryString += `CategoryId=${categoryId}&`;
-                if (sortParams) queryString += `sort=${JSON.stringify(sortParams)}`;
+                if (sortParams) queryString += `sort=${JSON.stringify(sortParams)}&`;
+                if (filterParams) {
+                    queryString += `filter=${JSON.stringify(filterParams)}`;
+                  };
                 return queryString;
             },
         }),
