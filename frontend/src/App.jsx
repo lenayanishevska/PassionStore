@@ -9,11 +9,10 @@ import { Cart } from './Pages/Cart/Cart'
 import { Login } from './Pages/Login/Login'
 import { Registration } from './Pages/Registration/Registration'
 import { Profile } from './Pages/Profile/Profile'
-import { useSelector } from 'react-redux'
+import { Admin } from './Pages/Admin/Admin'
 
 function App() {
   const [count, setCount] = useState(0);
-  const user = useSelector((state) => state.userInfo);
 
   return (
     <div>
@@ -21,14 +20,16 @@ function App() {
       <Navbar/>
       <Routes>
         <Route path='/' element={<Home/>}></Route>
-        {/* <Route path="/products/:category" element={<GenderCategory />}></Route> */}
         <Route path="/products/:category/:subcategory" element={<GenderCategory />}></Route>
         <Route path='/aboutUs' element={<AboutUs/>}></Route>
         <Route path='/products/:category/:subcategory/:productId' element={<ProductDetail/>}></Route>
 
         <Route path='/cart' element={<Cart/>}></Route>
-        <Route path='/login' element={user ? <Profile /> : <Login/>} ></Route>
+        <Route path='/login' element={<Login/>} ></Route>
+        <Route path='/profile' element={<Profile/>} ></Route>
         <Route path='/registration' element={ <Registration/>}></Route>
+        <Route path='/admin' element={ <Admin/>}></Route>
+
       </Routes>
       </BrowserRouter>
     </div>

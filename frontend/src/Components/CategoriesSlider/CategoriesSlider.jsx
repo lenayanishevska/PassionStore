@@ -1,14 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './CategoriesSlider.css'
 // import {categories} from '../../data.js'
-import Category from '../Category/Category.jsx'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { Link } from 'react-router-dom';
 
 
-export default function CategoriesSlider({subcategories}) {
+export default function CategoriesSlider({subcategories, setClothCategory}) {
+    const [isClicked, setIsClicked] = useState('');
+
+    console.log("IsClicked: ",isClicked);
+
     var settings = {
         dots: true,
         infinite: true,
@@ -16,13 +19,21 @@ export default function CategoriesSlider({subcategories}) {
         slidesToShow: 5,
         slidesToScroll: 1,
       };
+
   return (
     <div className="slider-container">
         <div className='slider'>
             <Slider {...settings}>
                 {subcategories.map((item) => {
                     return (
-                        <Link key={item.id} to={`/products/${item.parentCategoryId}/${item.id}`}><Category name={item.name}/></Link>
+                        <Link key={item.id} to={`/products/${item.parentCategoryId}/${item.id}`}>
+                            <div className='category-item center-flex' onClick={() => {
+                                setClothCategory(item.name);
+                                setIsClicked(item.name);
+                                }}>
+                                <h3>{item.name} {isClicked === item.name? <hr/>: <></>}</h3>
+                            </div>
+                        </Link>
                     )
                 })}
             </Slider>

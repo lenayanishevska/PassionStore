@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './GenderCategory.css'
 import CategoriesSlider from '../../Components/CategoriesSlider/CategoriesSlider'
 import { useParams } from "react-router-dom";
@@ -11,11 +11,38 @@ import Checkbox from '@mui/material/Checkbox';
 import { brown, grey } from '@mui/material/colors';
 
 export const GenderCategory = () => {
+  const [sortField, setSortField] = useState('name');
+  const [sortOrder, setSortOrder] = useState('ASC');
+  const [clothCategory, setClothCategory] = useState();
+  const [manufacturer, setManufacturer] = useState();
+  const [fromPrice, setFromPrice] = useState();
+  const [toPrice, setToPrice] = useState();
   const {category, subcategory} = useParams();
-  console.log(category, subcategory);
+
+  console.log("Cloth Category ", clothCategory);
 
   const {data} = useGetCategoriesQuery(category);
   const subcategories = data ? data.data : [];
+
+  const sortParams = {
+    sortField: sortField,
+    sortOrder: sortOrder,
+  }
+
+  const filterParams = {
+    clothCategory: clothCategory,
+    manufacturer: manufacturer,
+    fromPrice: fromPrice,
+    toPrice: toPrice,
+  }
+
+  const productParams = {
+    category: category,
+    subcategory: subcategory,
+    sortParams: sortParams,
+    filterParams: filterParams,
+  };
+
   const header = category === '1'? 'Men\'s': 'Women\'s';
 
   const materials = [{name: 'Cotton'}, {name:'Jeans'}, {name:'Silk'}, {name:'Wool'}, {name:'Leather'}, {name:'Cashemire'}];
@@ -24,7 +51,7 @@ export const GenderCategory = () => {
 
   return (
     <div className='catalog-page'>
-      <CategoriesSlider subcategories={subcategories}/>
+      <CategoriesSlider subcategories={subcategories} setClothCategory={setClothCategory}/>
       <div className="main-content flex-row">
         <div className="filters-container flex-column">
           <div className="filters flex-column">
@@ -43,7 +70,7 @@ export const GenderCategory = () => {
             </FormGroup>
           </div>
           <div className="filters flex-column">
-            <h3>Sizes</h3>
+            <h3>Brands</h3>
             <FormGroup>
               {sizes.map((item, index) => {
                 return (
@@ -78,15 +105,21 @@ export const GenderCategory = () => {
             <h2>{header} Cloth</h2>
             <div className='sort flex-row'>
               <h3>Sort by:</h3>
-              <select>
-                <option value="newest">Newest</option>
-                <option value="asc">Price (asc)</option>
-                <option value="desc">Price (desc)</option>
+              <select onChange={(e) => {
+                const [option, order] = e.target.value.split(' ');
+                setSortField(option);
+                setSortOrder(order);
+              }}>
+                <option value="name ASC">option</option>
+                <option value="price ASC">price (asc)</option>
+                <option value="price DESC">price (desc)</option>
+                <option value="name ASC">name (asc)</option>
+                <option value="name DESC">name (desc)</option>
               </select>
             </div>
           </div>
           <div className="products-list">
-            <Products category={category} subcategory={subcategory}/>
+            <Products params={productParams}/>
           </div>
         </div>
       </div>

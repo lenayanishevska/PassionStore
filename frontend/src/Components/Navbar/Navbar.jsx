@@ -2,13 +2,12 @@ import React, { useEffect } from 'react'
 import './Navbar.css'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch} from 'react-redux';
+import { useDispatch, useSelector} from 'react-redux';
 
 import { UpperNavBar } from '../UpperNavBar/UpperNavBar'
-import search from '../../assets/icons/search.png'
+import exit from '../../assets/icons/sign-out.png'
 import profile from '../../assets/icons/profile.png'
 import parcel from '../../assets/icons/parcel.png'
-import { DropDownMenu } from '../DropdownMenu/DropDownMenu'
 import { logoutAction } from '../../redux/Actions/UserActions'
 import toast from 'react-hot-toast';
 import { useGetCategoriesQuery } from '../../redux/Api/CategoriesApi';
@@ -19,11 +18,16 @@ export const Navbar = () => {
     const navigate = useNavigate();
     const {data} = useGetCategoriesQuery();
     const categories = data ? data.data : [];
+    const user = useSelector(state => state.userLogin.userInfo);
 
     const handlerLogout = () => {
         dispatch(logoutAction());
         toast.success('Logged out successfully!');
         navigate('/login');
+    }
+
+    const handlerProfile = () => {
+        user === ( null || undefined )? navigate('/login'): navigate('/profile')
     }
 
     useEffect(() => {
@@ -53,13 +57,11 @@ export const Navbar = () => {
             </div>
 
             <div className="nav-right flex-row">
-                <img src={search} alt="" onClick={handlerLogout}/>
-                <Link to='/login'><img src={profile} alt="" /></Link>
-                <Link to='/cart'><img src={parcel} alt="" /></Link>
+                <img src={profile} alt="" onClick={handlerProfile}/>
+                <Link to='/cart'><img src={parcel} alt=""/></Link>
+                <img src={exit} alt="" onClick={handlerLogout}/>
             </div>
         </nav>
-
-        <DropDownMenu menu={menu} />
     </div>
   )
 }

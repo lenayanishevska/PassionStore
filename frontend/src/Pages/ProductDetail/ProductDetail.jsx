@@ -1,22 +1,27 @@
 import React, { useState } from 'react'
 import './ProductDetail.css'
 import { useParams } from 'react-router-dom';
-import {products} from '../../data.js'
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css';
+import { useGetProductByIdQuery } from '../../redux/Api/ProductsApi.js';
 
 export const ProductDetail = () => {
-  const [quantity, setQuantity] = useState("0");
+  const [quantity, setQuantity] = useState("1");
   const { productId } = useParams();
-  const id = parseInt(productId);
 
-  const product = products.find(item => item.id === id);
+  const { data, error, isLoading } = useGetProductByIdQuery({ productId: productId });
+  console.log(data);
+  const product = data ? data.data : '';
+  console.log(product);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
   const name = product.name.toUpperCase();
 
-  const images = product.img;
-;
-  console.log(quantity)
+  const image = 'http://localhost:5001/' + product.image_url;
 
+  const sizes = ["S", "M"];
 
   
   return (
@@ -24,15 +29,7 @@ export const ProductDetail = () => {
       <div className="product-images ">
         <Slide>
               <div className="each-slide-effect">
-                  <div style={{ 'backgroundImage': `url(${images[0]})` }}>
-                  </div>
-              </div>
-              <div className="each-slide-effect">
-                  <div style={{ 'backgroundImage': `url(${images[1]})` }}>
-                  </div>
-              </div>
-              <div className="each-slide-effect">
-                  <div style={{ 'backgroundImage': `url(${images[2]})` }}>
+                  <div style={{ 'backgroundImage': `url(${image})` }}>
                   </div>
               </div>
         </Slide>
@@ -43,7 +40,7 @@ export const ProductDetail = () => {
 
           <h2>{name}</h2>
           <div className="product-price">
-            {product.price}
+            $ {product.price}
           </div>
 
         </div>
@@ -59,7 +56,7 @@ export const ProductDetail = () => {
               <h3>COLOR</h3>
 
               <div className="color-options flex-row">
-                <p>{product.color}</p>
+                <p>Beige</p>
               </div>
   
             </div>
@@ -69,9 +66,9 @@ export const ProductDetail = () => {
               <h3>SIZE</h3>
 
               <div className="size-options flex-row">
-                {product.sizes.map((size, index) => {
+                {sizes.map((size, index) => {
                   return (
-                    <div className='size' key={index}>{size.option}</div>
+                    <div className='size' key={index}>{size}</div>
                   )
                 })}
               </div>
@@ -92,6 +89,8 @@ export const ProductDetail = () => {
 
           <h3>DESCRIPTION</h3>
           <p>{product.description}</p>
+          <h3>Brand</h3>
+          <p>{product.Manufacturer.name}</p>
 
         </div>
 
@@ -100,7 +99,7 @@ export const ProductDetail = () => {
         <div className="product-attribes flex-column">
 
           <h3>MATERIALS</h3>
-          <p>{product.material}</p>
+          <p>Cotton</p>
 
         </div>
 
