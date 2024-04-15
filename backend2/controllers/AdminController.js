@@ -11,8 +11,9 @@ class AdminController {
     });
 
     const orderCount = orders.length;
-    const totalAmountSum = orders.reduce((order, val) => {
-      return order.total_amount + val;
+    const totalAmountSum = orders.reduce((val, order) => {
+      console.log(order, val);
+      return +order.total_amount + +val;
     }, 0);
     const orderIds = orders.map(order => order.id);
 
