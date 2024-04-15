@@ -1,14 +1,31 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './Profile.css'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector} from 'react-redux';
 import { logoutAction } from '../../redux/Actions/UserActions';
 import toast from 'react-hot-toast';
 
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 export const Profile = () => {
   const user = useSelector(state => state.userLogin.userInfo);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handlerLogout = () => {
     dispatch(logoutAction());
@@ -40,19 +57,89 @@ export const Profile = () => {
         <div className="user-address flex-column">
           <div className="user-address-header flex-row">
             <h3>Address</h3>
-            <span>Edit</span>
+            {
+              user.address ? <></> 
+              : <span onClick={handleClickOpen}>Edit</span>
+            }
+              <Dialog
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                  component: 'form',
+                  onSubmit: (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(event.currentTarget);
+                    const formJson = Object.fromEntries(formData.entries());
+                    const address = formJson.address;
+                    console.log(address);
+                    handleClose();
+                  },
+                }}
+              >
+                <DialogTitle>Add Address</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    autoFocus
+                    required
+                    margin="dense"
+                    id="name"
+                    name="address"
+                    label="Address"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                  />
+                  <TextField
+                    autoFocus
+                    required
+                    margin="dense"
+                    id="name"
+                    name="city"
+                    label="City"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                  />
+                  <TextField
+                    autoFocus
+                    required
+                    margin="dense"
+                    id="name"
+                    name="country"
+                    label="Country"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                  />
+                  <TextField
+                    autoFocus
+                    required
+                    margin="dense"
+                    id="name"
+                    name="zipcode"
+                    label="Zipcode"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose}>Cancel</Button>
+                  <Button type="submit">Subscribe</Button>
+                </DialogActions>
+              </Dialog>
           </div>
           <hr />
           <div className="user-adsress-info">
             {
-              true ? <span>No address added!</span> 
+              !user.address ? <span>No address added!</span> 
               : <div className="details-info flex-column">
                   <span>Street:</span>
-                  <p>Gorodotska, 173</p>
+                  <p>{user.address.address}</p>
                   <span>City:</span>
-                  <p>Lviv</p>
+                  <p>{user.address.city}</p>
                   <span>Country:</span>
-                  <p>Ukraine</p>
+                  <p>{user.address.country}</p>
                 </div>
             }
           </div>

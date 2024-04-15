@@ -5,13 +5,13 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import Box from '@mui/material/Box';
+import { BarChart } from '@mui/x-charts/BarChart';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 
 export const Dashboard = () => {
-    const [chartData, setChartData] = useState({});
-    const [chartOptions, setChartOptions] = useState({});
+    // const [chartData, setChartData] = useState({});
+    // const [chartOptions, setChartOptions] = useState({});
 
     const [age, setAge] = React.useState('');
 
@@ -19,66 +19,66 @@ export const Dashboard = () => {
       setAge(event.target.value);
     };
 
-    useEffect(() => {
-        const documentStyle = getComputedStyle(document.documentElement);
-        const textColor = documentStyle.getPropertyValue('--text-color');
-        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-        const data = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'My First dataset',
-                    backgroundColor: documentStyle.getPropertyValue('--blue-500'),
-                    borderColor: documentStyle.getPropertyValue('--blue-500'),
-                    data: [65, 59, 80, 81, 56, 55, 40]
-                },
-                {
-                    label: 'My Second dataset',
-                    backgroundColor: documentStyle.getPropertyValue('--pink-500'),
-                    borderColor: documentStyle.getPropertyValue('--pink-500'),
-                    data: [28, 48, 40, 19, 86, 27, 90]
-                }
-            ]
-        };
-        const options = {
-            maintainAspectRatio: false,
-            aspectRatio: 0.8,
-            plugins: {
-                legend: {
-                    labels: {
-                        fontColor: textColor
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: textColorSecondary,
-                        font: {
-                            weight: 500
-                        }
-                    },
-                    grid: {
-                        display: false,
-                        drawBorder: false
-                    }
-                },
-                y: {
-                    ticks: {
-                        color: textColorSecondary
-                    },
-                    grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
-                    }
-                }
-            }
-        };
+    // useEffect(() => {
+    //     const documentStyle = getComputedStyle(document.documentElement);
+    //     const textColor = documentStyle.getPropertyValue('--text-color');
+    //     const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+    //     const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    //     const data = {
+    //         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    //         datasets: [
+    //             {
+    //                 label: 'My First dataset',
+    //                 backgroundColor: documentStyle.getPropertyValue('--blue-500'),
+    //                 borderColor: documentStyle.getPropertyValue('--blue-500'),
+    //                 data: [65, 59, 80, 81, 56, 55, 40]
+    //             },
+    //             {
+    //                 label: 'My Second dataset',
+    //                 backgroundColor: documentStyle.getPropertyValue('--pink-500'),
+    //                 borderColor: documentStyle.getPropertyValue('--pink-500'),
+    //                 data: [28, 48, 40, 19, 86, 27, 90]
+    //             }
+    //         ]
+    //     };
+    //     const options = {
+    //         maintainAspectRatio: false,
+    //         aspectRatio: 0.8,
+    //         plugins: {
+    //             legend: {
+    //                 labels: {
+    //                     fontColor: textColor
+    //                 }
+    //             }
+    //         },
+    //         scales: {
+    //             x: {
+    //                 ticks: {
+    //                     color: textColorSecondary,
+    //                     font: {
+    //                         weight: 500
+    //                     }
+    //                 },
+    //                 grid: {
+    //                     display: false,
+    //                     drawBorder: false
+    //                 }
+    //             },
+    //             y: {
+    //                 ticks: {
+    //                     color: textColorSecondary
+    //                 },
+    //                 grid: {
+    //                     color: surfaceBorder,
+    //                     drawBorder: false
+    //                 }
+    //             }
+    //         }
+    //     };
 
-        setChartData(data);
-        setChartOptions(options);
-    }, []);
+    //     setChartData(data);
+    //     setChartOptions(options);
+    // }, []);
 
   return (
     <div className='dashboard flex-column'>
@@ -110,7 +110,13 @@ export const Dashboard = () => {
         </div>
         <div className="expenses-incomes flex-row">
             <div className="chart">
-                <Chart type="bar" data={chartData} options={chartOptions}/>
+                <BarChart
+                    xAxis={[{ scaleType: 'band', data: ['Jan', 'Feb', 'Mar','Apr','May','Jun','Jul', 'Aug', 'Sep','Oct','Nov','Des'] }]}
+                    series={[{ data: [100, 600, 300, 700, 500, 300, 400, 200, 500, 400, 1000, 800] }, { data: [200, 500, 600, 800, 500, 1000, 300, 600, 400, 700, 1000, 900] }]}
+                    width={800}
+                    height={400}
+                    colorSet={['#6B292A', '#716D69']}
+                />
             </div>
             <div className="expences-container flex-column">
                 <span>Add New Expence:</span>
