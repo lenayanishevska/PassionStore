@@ -1,6 +1,7 @@
 const Router = require("express");
 const productController = require("../controllers/ProductController");
 const categoryController = require("../controllers/CategoryController");
+const expensesController = require("../controllers/ExpensesController");
 const pageController = require("../controllers/PageController");
 const authMiddleware = require("../middleware/AuthMiddleware");
 const wrapAsync = require('../middleware/WrapAsync');
@@ -14,8 +15,12 @@ router.get("/products/createOrder", authMiddleware, wrapAsync(productController.
 router.post("/products/create", authMiddleware, wrapAsync(productController.create));
 router.get("/products/getById", wrapAsync(productController.getById));
 
-router.get("/categories/list", wrapAsync(categoryController.list));2
+router.get("/categories/list", wrapAsync(categoryController.list));
 router.post("/categories/create", authMiddleware, wrapAsync(categoryController.create));
+
+router.get("/expeses/list", wrapAsync(expensesController.list));
+router.post("/expeses/create", authMiddleware, wrapAsync(expensesController.create));
+router.post("/expeses/createCategory", authMiddleware, wrapAsync(expensesController.createCategory));
 
 router.get("/pages/list", authMiddleware, wrapAsync(pageController.list));
 router.get("/pages/item", wrapAsync(pageController.item));
