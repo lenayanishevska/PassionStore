@@ -9,7 +9,8 @@
     width: 92%;
 }
 .category-item{
-    width: 90%;
+    padding: 10px;
+    width: 50%;
     border-radius: 20px;
     background: rgba(204, 179, 160, 0.25);
     height: 50px;
@@ -19,6 +20,7 @@
     color: var(--dark-black-color);
     font-size: 20px;
     font-weight: 200;
+    text-align: center;
 }
 
 .category-item h3:hover {
@@ -27,7 +29,7 @@
 
 .category-item hr {
     border: none;
-    width: 100%;
+    width: 50%;
     height: 3px;
     border-radius: 10px;
     background: var(--red-color);

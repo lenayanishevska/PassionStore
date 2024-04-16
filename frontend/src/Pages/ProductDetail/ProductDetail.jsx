@@ -10,9 +10,7 @@ export const ProductDetail = () => {
   const { productId } = useParams();
 
   const { data, error, isLoading } = useGetProductByIdQuery({ productId: productId });
-  console.log(data);
   const product = data ? data.data : '';
-  console.log(product);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
