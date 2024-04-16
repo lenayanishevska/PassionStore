@@ -114,6 +114,30 @@ class UserController {
     return userWithAddress;
   }
 
+  async getUserAddress(req, res, next) {
+    const querySchema = Joi.object({
+      userId: Joi.number(),
+    });
+
+    const { userId } = await querySchema.validateAsync(req.query);
+
+    const user = await User.findOne({where: {id: userId}});
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const userAddressId = user.UserAddressId;
+
+    if (!userAddressId) {
+      throw new Error('No address was added');
+    }
+
+    const userAddress = await UserAddress.findOne({where: {id: userAddressId}});
+
+    return userAddress;
+  }
+
 
 
   async check(req, res, next) {

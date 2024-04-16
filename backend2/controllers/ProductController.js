@@ -115,25 +115,6 @@ class ProductController {
     return product;
   }
 
-  async sortedList(req, res, next) {
-    const querySchema = Joi.object({
-      sortField: Joi.string(),
-      sortOrder: Joi.string(),
-    });
-
-    const { sortField, sortOrder } = await querySchema.validateAsync(req.query);
-
-    try {
-        const products = await Product.findAll({
-            order: [[sortField, sortOrder]], // sortField - поле для сортування, sortOrder - 'ASC' або 'DESC'
-        });
-        return products;
-    } catch (error) {
-        console.error('Error fetching sorted products:', error);
-        throw error;
-    }
-  }
-
   
 
   async addToCart(req, res, next) {

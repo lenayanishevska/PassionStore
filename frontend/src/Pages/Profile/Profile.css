@@ -49,6 +49,19 @@
     color: var(--pastel-red-color);
 }
 
+.address-info span {
+    font-size: 14px;
+    font-weight: 200;
+    color: var(--pastel-red-color);
+}
+
+.address-info p {
+    margin: 5px;
+    font-size: 18px;
+    font-weight: 200;
+    color: var(--light-black-color);
+}
+
 .details-info p {
     margin: 5px;
     font-size: 18px;
@@ -110,17 +123,15 @@
     width: 30%;
 }
 
-
 .profile-buttons button:hover {
     border: 2px solid rgba(53, 52, 52, 0.9);
     background-color: rgba(53, 52, 52, 0.4);
     color: var(--light-black-color);
 }
 
-.user-adsress-info span{
+.user-adsress-info h3{
     margin: 5px;
     font-size: 18px;
     font-weight: 200;
-    color: var(--dark-black-color);
-
+    color: var(--light-black-color);
 }

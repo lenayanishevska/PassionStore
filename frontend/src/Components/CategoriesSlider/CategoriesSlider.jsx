@@ -16,7 +16,8 @@ export default function CategoriesSlider({subcategories,setFilterParams}) {
         speed: 500,
         slidesToShow: 5,
         slidesToScroll: 1,
-      };
+
+    };
 
   return (
     <div className="slider-container">
@@ -24,15 +25,15 @@ export default function CategoriesSlider({subcategories,setFilterParams}) {
             <Slider {...settings}>
                 {subcategories.map((item) => {
                     return (
-
-                        <div key={item.id} className='category-item center-flex' onClick={() => {
+                        <div key={item.id} className='category-item' onClick={() => {
                             setIsClicked(item.name);
                             setFilterParams(prevParams => ({
                                 ...prevParams,
                                 CategoryId: !item.id ? null : item.id
                               }));
                             }}>
-                            <h3>{item.name} {isClicked === item.name? <hr/>: <></>}</h3>
+                            <h3 style={{color: isClicked === item.name ? '#AC5656' : 'inherit'}}>{item.name}  </h3>
+                            {/* {isClicked === item.name? <hr/>: <></>} */}
                         </div>
                     )
                 })}

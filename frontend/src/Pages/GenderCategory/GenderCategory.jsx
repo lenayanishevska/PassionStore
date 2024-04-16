@@ -95,6 +95,28 @@ export const GenderCategory = () => {
                 // getAriaValueText={valuetext}
                 min={1} // Мінімальне значення
                 max={1000} // Максимальне значення
+                sx={{
+                  // Зміна колірних властивостей для слайдера
+                  '& .MuiSlider-thumb': {
+                      color: '#AC5656', // Колір для кульки-вказівника
+                      '&:hover, &.Mui-focusVisible': {
+                        boxShadow: '0px 0px 0px 8px rgba(172, 86, 86, 0.16)', // Колір підсвітки кульки при наведенні або фокусі
+                    },
+                  },
+                  '& .MuiSlider-track': {
+                      color: '#AC5656', // Колір для заповненої частини слайдера
+                  },
+                  '& .MuiSlider-rail': {
+                      color: '#ccc', // Колір для незаповненої частини слайдера
+                  },
+                  '& .MuiSlider-valueLabel': {
+                      color: '#AC5656', // Колір для мітки значення
+                  },
+                  '& .MuiSlider-valueLabel': {
+                    color: '#AC5656', // Колір для мітки значення
+                    backgroundColor: '#B8B2AA', // Колір формочки з цифрою, що з'являється
+                  },
+              }}
               />
             </Box>
           </div>

@@ -6,7 +6,8 @@ const wrapAsync = require('../middleware/WrapAsync');
 
 router.post("/registration", userController.registration);
 router.post("/login", userController.login);
-router.post("/addAddress", authMiddleware, wrapAsync(userController.addAddress));
+router.post("/addAddress", wrapAsync(userController.addAddress));
+router.get("/getAddress", wrapAsync(userController.getUserAddress));
 router.get("/auth", authMiddleware, userController.check);
 
 module.exports = router;

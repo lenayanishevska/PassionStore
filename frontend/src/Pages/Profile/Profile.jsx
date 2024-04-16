@@ -10,14 +10,25 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useAddAddressMutation, useGetAddressQuery } from '../../redux/Api/UserAddressApi';
 
 export const Profile = () => {
   const user = useSelector(state => state.userLogin.userInfo);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  const { data, refetch} = useGetAddressQuery(user.id);
+  const address = (data === undefined || data.success === false) ? '' : data.data;
+
+  const [addAddress, {isError}] = useAddAddressMutation({
+    onSuccess: () => {
+      // Оновлюємо дані про адресу після успішного додавання
+      refetch();
+    },
+  });
+
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -31,7 +42,8 @@ export const Profile = () => {
     dispatch(logoutAction());
     toast.success('Logged out successfully!');
     navigate('/login');
-}
+
+  }
 
   return (
     <div className='profile flex-column'>
@@ -58,20 +70,27 @@ export const Profile = () => {
           <div className="user-address-header flex-row">
             <h3>Address</h3>
             {
-              user.address ? <></> 
-              : <span onClick={handleClickOpen}>Edit</span>
+              address === '' ? <span onClick={handleClickOpen}>Edit</span>
+              : <></>
             }
               <Dialog
                 open={open}
                 onClose={handleClose}
                 PaperProps={{
                   component: 'form',
-                  onSubmit: (event) => {
+                  onSubmit: async (event) => {
                     event.preventDefault();
                     const formData = new FormData(event.currentTarget);
                     const formJson = Object.fromEntries(formData.entries());
                     const address = formJson.address;
-                    console.log(address);
+                    const city = formJson.city;
+                    const country = formJson.country;
+                    const zipcode = formJson.zipcode;
+
+                    console.log(address, city, country, zipcode, user.id);
+
+                    await addAddress({address: address, city: city, country: country, zipcode: zipcode, userId: user.id}).unwrap();
+
                     handleClose();
                   },
                 }}
@@ -132,14 +151,14 @@ export const Profile = () => {
           <hr />
           <div className="user-adsress-info">
             {
-              !user.address ? <span>No address added!</span> 
-              : <div className="details-info flex-column">
+              address === '' ? <h3>No address added!</h3> 
+              : <div className="address-info flex-column">
                   <span>Street:</span>
-                  <p>{user.address.address}</p>
+                  <p>{address.address}</p>
                   <span>City:</span>
-                  <p>{user.address.city}</p>
+                  <p>{address.city}</p>
                   <span>Country:</span>
-                  <p>{user.address.country}</p>
+                  <p>{address.country}</p>
                 </div>
             }
           </div>
