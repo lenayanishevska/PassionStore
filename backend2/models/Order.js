@@ -26,11 +26,6 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         defaultValue: "Processing",
       },
-      userId: {
-        field: 'user_id',
-        type: Sequelize.INTEGER(),
-        allowNull: false,
-      },
     },
     {
       timestamps: false,

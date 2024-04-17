@@ -1,9 +1,28 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './Cart.css'
 import { CartProduct } from '../../Components/CartProduct/CartProduct'
-import { cartProducts } from '../../data'
+import { useGetOrderProductsQuery } from '../../redux/Api/OderApi'
+import { useSelector} from 'react-redux';
 
 export const Cart = () => {
+  const user = useSelector(state => state.userLogin.userInfo);
+
+  if(!user) {
+    console.log("User was not found");
+  }
+
+  const userId = user.id;
+  const { data, refetch} = useGetOrderProductsQuery(userId);
+  const cartProducts = data ? data.data : [];
+
+  useEffect(() => {
+    refetch();
+  }, [userId, refetch]);
+
+  const total = cartProducts.reduce((accumulator, item) => {
+    return accumulator + item.amount;
+  }, 0).toFixed(2);
+
   return (
     <div className='shopping-cart flex-row'>
 
@@ -18,12 +37,13 @@ export const Cart = () => {
               <div className='cart-product-option'>Price</div>
               <div className="cart-product-option">Quantity</div>
               <div className="cart-product-option">Total</div>
+              <div className="cart-product-option">Delete</div>
           </div>
         </div>
         {
           cartProducts.map((item) => {
               return (
-                  <CartProduct key={item.id} item={item}/>
+                  <CartProduct key={item.id} item={item} />
               )
         })}
       </div>
@@ -36,7 +56,7 @@ export const Cart = () => {
           </div>
           <div className="order-price-content flex-row">
             <span>Total price: </span>
-            <div className="order-price">$ 20</div>
+            <div className="order-price">$ {total}</div>
           </div>
           <button>Buy Now</button>
         </div>

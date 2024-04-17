@@ -7,11 +7,6 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
-    productId: {
-      field: 'product_id',
-      type: Sequelize.INTEGER(),
-      allowNull: false,
-    },
     amount: {
       field: 'amount',
       type: Sequelize.FLOAT,
@@ -22,16 +17,6 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
-    userId: {
-      field: 'user_id',
-      type: Sequelize.INTEGER(),
-      allowNull: false,
-    },
-    orderId: {
-      field: 'order_id',
-      type: Sequelize.INTEGER(),
-      allowNull: true,
-    },
   }, {
     timestamps: false,
     tableName: 'order_products',
@@ -40,6 +25,7 @@ module.exports = (sequelize, Sequelize) => {
   OrderProduct.associate = (models) => {
     OrderProduct.belongsTo(models.Order);
     OrderProduct.belongsTo(models.Product);
+    OrderProduct.belongsTo(models.User);
   };
 
   return OrderProduct;
