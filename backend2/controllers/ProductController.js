@@ -7,7 +7,6 @@ const { Product, OrderProduct, Order, Attribute, Option, OptionValue, Category, 
 
 class ProductController {
   async list(req, res, next) {
-    console.log("PArams>>>>> ", req.query);
     const querySchema = Joi.object({
       parentCategoryId: Joi.number(),
       sort: Joi.string().optional(),
@@ -15,8 +14,6 @@ class ProductController {
     });
 
     const { parentCategoryId, sort, filter} = await querySchema.validateAsync(req.query);
-
-    console.log("Filter string ....................",filter)
 
     const where = {};
 
@@ -115,14 +112,14 @@ class ProductController {
     return product;
   }
 
-  
-
   async addToCart(req, res, next) {
     const bodySchema = Joi.object({
       productId: Joi.number().required(),
+      quantity: Joi.number().required(),
+      sizeId: Joi.number().required(),
     });
 
-    const { productId } = await bodySchema.validateAsync(req.body);
+    const { productId, quantity, sizeId } = await bodySchema.validateAsync(req.body);
 
     const userId = req.user.id;
 
@@ -138,15 +135,15 @@ class ProductController {
 
     const orderProduct = await OrderProduct.findOne({
       where: {
-        productId,
-        userId,
+        ProductId: productId,
+        UserId: userId,
       },
     });
 
     if (orderProduct) {
       await OrderProduct.update({
-        quantity: orderProduct.quantity + 1,
-        amount: product.amount * (orderProduct.quantity + 1),
+        quantity: orderProduct.quantity + quantity,
+        amount: product.price * (orderProduct.quantity + quantity),
       }, {
         where: {
           id: orderProduct.id,
@@ -154,25 +151,44 @@ class ProductController {
       });
     } else {
       await OrderProduct.create({
-        productId,
-        userId,
-        amount: product.amount,
-        quantity: 1,
-        orderId: null,
+        ProductId: productId,
+        UserId: userId,
+        amount: product.price * quantity,
+        quantity: quantity,
+        OrderId: null,
       });
     }
 
     return true;
   }
 
+  async deleteFromCart(req, res, next) {
+    const querySchema = Joi.object({
+      orderProductId: Joi.number().required()
+    });
+
+    const { orderProductId } = await querySchema.validateAsync(req.query);
+
+    const item = await OrderProduct.destroy({
+      where: {
+          id: orderProductId,
+          OrderId: null // Перевірка, що товар не входить до замовлення
+      }
+    });
+
+    return item;
+  }
+
+
   async cartList(req, res, next) {
     const userId = req.user.id;
 
     const list = await OrderProduct.findAll({
       where: {
-        userId,
-        orderId: null,
+        UserId: userId,
+        OrderId: null,
       },
+      include: { model: Product }
     });
 
     return list;

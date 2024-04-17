@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = function (req, res, next) {
+  console.log("Headers .......... ",req.headers.authorization);
   if (req.method === "OPTIONS") {
     next();
   }

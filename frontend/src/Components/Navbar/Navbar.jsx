@@ -27,7 +27,7 @@ export const Navbar = () => {
     }
 
     const handlerProfile = () => {
-        user === ( null || undefined )? navigate('/login'): navigate('/profile')
+        user === ( null || undefined ) ? navigate('/login'): navigate('/profile')
     }
 
     useEffect(() => {

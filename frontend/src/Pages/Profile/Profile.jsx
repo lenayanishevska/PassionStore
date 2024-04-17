@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './Profile.css'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector} from 'react-redux';
@@ -22,12 +22,11 @@ export const Profile = () => {
   const { data, refetch} = useGetAddressQuery(user.id);
   const address = (data === undefined || data.success === false) ? '' : data.data;
 
-  const [addAddress, {isError}] = useAddAddressMutation({
-    onSuccess: () => {
-      // Оновлюємо дані про адресу після успішного додавання
-      refetch();
-    },
-  });
+  const [addAddress] = useAddAddressMutation({});
+
+  useEffect(() => {
+    refetch();
+  }, [user.id, refetch]);
 
 
   const handleClickOpen = () => {

@@ -135,3 +135,46 @@
     height: 40px;
 }
 
+.toast-custom {
+    margin-top: 6%;
+    border: 2px solid #5A0900; 
+    border-radius: 10px;
+    padding: 20px;
+    background:#b8b2aaea;
+;
+}
+
+.toast-add-cart-button {
+    height: 30px;
+    width: 50%;
+    font-size: 14px;
+    text-align: center;
+    font-weight: 200;
+    border: none;
+    border-radius: 10px;
+    color: #b8b2aaea;
+    background-color: rgba(30, 30, 30, 0.8);
+    cursor: pointer;
+}
+
+.toast-add-cart-button:hover {
+    border: 2px solid rgba(53, 52, 52, 0.9);
+    background-color: rgba(53, 52, 52, 0.4);
+    color: var(--light-black-color);
+}
+
+.toast-add-to-cart {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.toast-add-cart-text {
+    color: #AC5656;
+    font-size: 18px;
+    font-weight: 400;
+    margin: 5px;
+    text-align: center;
+}
+
