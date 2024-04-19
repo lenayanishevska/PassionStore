@@ -15,15 +15,19 @@ class UserController {
     const { fullName, email, password, is_admin} = req.body;
 
     if (!email || !password) {
-      return next(ApiError.badRequest("Wrong email or password!"));
+      throw new ApiError(400, "Wrong email or password!");
     }
 
     const candidate = await User.findOne({ where: { email } });
     if (candidate) {
-      return next(ApiError.badRequest("The user already exist!"));
+      throw new ApiError(400, "The user already exist!");
     }
 
     const [first_name, last_name] = fullName.split(" ");
+
+    if (!first_name || !last_name) {
+      throw new ApiError(400, "Invalid full name");
+    }
 
     const hashPassword = await bcrypt.hash(password, 5);
     const user = await User.create({
@@ -34,15 +38,15 @@ class UserController {
       is_admin,
     });
     const token = generateJwt(user.id, user.email);
-    return res.json({
+    return {
       id: user.id,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      first_name: user.first_name || 'firstname',
+      last_name: user.last_name || 'lastname',
       email: user.email,
       password: user.password,
       is_admin: user.is_admin,
       token: token,
-    });
+    };
   }
 
   async login(req, res, next) {
@@ -51,7 +55,7 @@ class UserController {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return next(ApiError.internal("User not found"));
+      throw new ApiError(400, "User not found");
     }
 
     const userAddressId = user.UserAddressId;
@@ -60,12 +64,12 @@ class UserController {
     let comparePassword = bcrypt.compareSync(password, user.password);
 
     if (!comparePassword) {
-      return next(ApiError.internal("Wrong password"));
+      throw new ApiError(400, "Wrong password");
     }
 
     const token = generateJwt(user.id, user.email);
 
-    return res.json({
+    return {
       id: user.id,
       first_name: user.first_name,
       last_name: user.last_name,
@@ -74,7 +78,7 @@ class UserController {
       is_admin: user.is_admin,
       address: userAddress,
       token: token,
-    });
+    };
   }
 
   async addAddress(req, res, next) {
@@ -90,7 +94,7 @@ class UserController {
 
     const user = await User.findOne( { where: { id: userId } });
     if(user.UserAddressId) {
-      throw new Error('Address have already been added!');
+      throw new ApiError(400, 'Address have already been added!');
     }
 
     const userAddress = await UserAddress.create({
@@ -101,7 +105,7 @@ class UserController {
     });
 
     if (!userAddress) {
-      throw new Error('Can\'t add address');
+      throw new ApiError(400, 'Can\'t add address');
     }
 
     await User.update(
@@ -124,13 +128,13 @@ class UserController {
     const user = await User.findOne({where: {id: userId}});
 
     if (!user) {
-      throw new Error('User not found');
+      throw new ApiError(400, 'User not found');
     }
 
     const userAddressId = user.UserAddressId;
 
     if (!userAddressId) {
-      throw new Error('No address was added');
+      throw new ApiError(400, 'No address was added');
     }
 
     const userAddress = await UserAddress.findOne({where: {id: userAddressId}});
@@ -142,7 +146,7 @@ class UserController {
 
   async check(req, res, next) {
     const token = generateJwt(req.user.id, req.user.email);
-    return res.json({ token });
+    return { token };
   }
 }
 

@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  const ProductAttribute = sequelize.define('ProductAttribute', {
+  const OptionValue = sequelize.define('OptionValue', {
     id: {
       field: 'id',
       type: Sequelize.INTEGER(),
@@ -19,11 +19,19 @@ module.exports = (sequelize, Sequelize) => {
     },
   }, {
     timestamps: false,
-    tableName: 'product_attributes',
+    tableName: 'option_values',
   });
 
-  ProductAttribute.associate = (models) => {
+  OptionValue.associate = (models) => {
+    OptionValue.belongsToMany(models.Product, { through: models.ProductOption });
+
+    OptionValue.belongsTo(models.Option, {
+      as: 'option',
+      constraints: false,
+      targetKey: 'id',
+      foreignKey: 'optionId',
+    });
   };
 
-  return ProductAttribute;
+  return OptionValue;
 };

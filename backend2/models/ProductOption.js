@@ -7,6 +7,11 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false,
     },
+    productId: {
+      field: 'product_id',
+      type: Sequelize.INTEGER(),
+      allowNull: false,
+    },
     optionValueId: {
       field: 'option_value_id',
       type: Sequelize.INTEGER(),
@@ -18,6 +23,18 @@ module.exports = (sequelize, Sequelize) => {
   });
 
   ProductOption.associate = (models) => {
+    ProductOption.belongsTo(models.Product, {
+      as: 'product',
+      constraints: false,
+      targetKey: 'id',
+      foreignKey: 'productId',
+    });
+    ProductOption.belongsTo(models.OptionValue, {
+      as: 'optionValue',
+      constraints: false,
+      targetKey: 'id',
+      foreignKey: 'optionValueId',
+    });
   };
 
   return ProductOption;

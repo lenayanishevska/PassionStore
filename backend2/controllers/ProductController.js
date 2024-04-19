@@ -1,9 +1,20 @@
-const Joi = require('joi');
-const uuid = require('uuid');
-const path = require('path');
+const Joi = require("joi");
+const uuid = require("uuid");
+const path = require("path");
 const { Op } = require("sequelize");
 
-const { Product, OrderProduct, Order, Attribute, Option, OptionValue, Category, Manufacturer } = require("../models");
+const {
+  Product,
+  OrderProduct,
+  Order,
+  Attribute,
+  Option,
+  OptionValue,
+  Category,
+  Manufacturer,
+  ProductAttribute,
+  ProductOption,
+} = require("../models");
 
 class ProductController {
   async list(req, res, next) {
@@ -13,31 +24,38 @@ class ProductController {
       filter: Joi.string().optional(),
     });
 
-    const { parentCategoryId, sort, filter} = await querySchema.validateAsync(req.query);
+    const { parentCategoryId, sort, filter } = await querySchema.validateAsync(
+      req.query
+    );
 
     const where = {};
 
     if (parentCategoryId) {
-      const categories = await Category.findAll({ where: { parentCategoryId } });
-      const categoryIds = categories.map(category => category.id);
+      const categories = await Category.findAll({
+        where: { parentCategoryId },
+      });
+      const categoryIds = categories.map((category) => category.id);
       where.CategoryId = categoryIds;
     }
 
-    if(filter) {
-      const { CategoryId, manufacturer, fromPrice, toPrice } = JSON.parse(filter); // Витягуємо параметри фільтру з об'єкта filter
+    if (filter) {
+      const { CategoryId, manufacturer, fromPrice, toPrice } =
+        JSON.parse(filter); // Витягуємо параметри фільтру з об'єкта filter
 
-      if(CategoryId) {
+      if (CategoryId) {
         where.CategoryId = CategoryId; // Додаємо умову для категорії одягу
       }
-      if(manufacturer) {
+      if (manufacturer) {
         // Отримуємо ідентифікатор виробника за його іменем з іншої таблички Manufacturer
-        const manufacturerInstance = await Manufacturer.findOne({ where: { name: manufacturer } });
-        console.log("Manufacturer: ", manufacturerInstance.id)
-        if(manufacturerInstance) {
+        const manufacturerInstance = await Manufacturer.findOne({
+          where: { name: manufacturer },
+        });
+        console.log("Manufacturer: ", manufacturerInstance.id);
+        if (manufacturerInstance) {
           where.ManufacturerId = manufacturerInstance.id; // Додаємо умову для ідентифікатора виробника
         }
       }
-      if(fromPrice && toPrice) {
+      if (fromPrice && toPrice) {
         where.price = { [Op.between]: [fromPrice, toPrice] }; // Додаємо умову для ціни в межах від fromPrice до toPrice
       }
     }
@@ -45,9 +63,10 @@ class ProductController {
     console.log("Filters ................", where);
 
     let order = [];
-    if (sort) { // Якщо переданий параметр сортування, додати його до умови сортування
-        const { sortField, sortOrder } = JSON.parse(sort);
-        order = [[sortField, sortOrder]];
+    if (sort) {
+      // Якщо переданий параметр сортування, додати його до умови сортування
+      const { sortField, sortOrder } = JSON.parse(sort);
+      order = [[sortField, sortOrder]];
     }
 
     const list = await Product.findAll({ where, order });
@@ -65,11 +84,11 @@ class ProductController {
       ManufacturerId: Joi.number().required(),
     });
 
-    const { name, description, price, SKU, CategoryId, ManufacturerId} = await bodySchema.validateAsync(req.body);
-    const {image_url} = req.files;
+    const { name, description, price, SKU, CategoryId, ManufacturerId } =
+      await bodySchema.validateAsync(req.body);
+    const { image_url } = req.files;
     let fileName = uuid.v4() + ".jpg";
-    image_url.mv(path.resolve(__dirname, '..', 'static', fileName));
-
+    image_url.mv(path.resolve(__dirname, "..", "static", fileName));
 
     const product = await Product.create({
       name,
@@ -78,7 +97,7 @@ class ProductController {
       SKU,
       image_url: fileName,
       CategoryId,
-      ManufacturerId
+      ManufacturerId,
     });
 
     return product;
@@ -97,19 +116,59 @@ class ProductController {
       },
       include: [
         {
-          model: Category
+          model: Category,
         },
         {
-          model: Manufacturer
+          model: Manufacturer,
         },
       ],
     });
 
     if (!product) {
-      throw new Error('Product not found');
+      throw new Error("Product not found");
     }
 
-    return product;
+    const attributes = await ProductAttribute.findAll({
+      where: {
+        productId,
+      },
+      include: [
+        {
+          model: Attribute,
+          as: 'attribute',
+        },
+      ],
+    });
+
+    const options = await ProductOption.findAll({
+      where: {
+        productId,
+      },
+      include: [
+        {
+          model: OptionValue,
+          as: 'optionValue',
+          include: [
+            {
+              model: Option,
+              as: 'option',
+            },
+          ],
+        },
+      ],
+    });
+
+    return {
+      product,
+      attributes: attributes.map(attribute => ({
+        name: attribute.attribute.name,
+        value: attribute.value,
+      })),
+      options: options.map(option => ({
+        value: option.optionValue.value,
+        name: option.optionValue.option.name,
+      })),
+    };
   }
 
   async addToCart(req, res, next) {
@@ -119,7 +178,9 @@ class ProductController {
       sizeId: Joi.number().required(),
     });
 
-    const { productId, quantity, sizeId } = await bodySchema.validateAsync(req.body);
+    const { productId, quantity, sizeId } = await bodySchema.validateAsync(
+      req.body
+    );
 
     const userId = req.user.id;
 
@@ -130,7 +191,7 @@ class ProductController {
     });
 
     if (!product) {
-      throw new Error('Product not found');
+      throw new Error("Product not found");
     }
 
     const orderProduct = await OrderProduct.findOne({
@@ -141,14 +202,17 @@ class ProductController {
     });
 
     if (orderProduct) {
-      await OrderProduct.update({
-        quantity: orderProduct.quantity + quantity,
-        amount: product.price * (orderProduct.quantity + quantity),
-      }, {
-        where: {
-          id: orderProduct.id,
+      await OrderProduct.update(
+        {
+          quantity: orderProduct.quantity + quantity,
+          amount: product.price * (orderProduct.quantity + quantity),
         },
-      });
+        {
+          where: {
+            id: orderProduct.id,
+          },
+        }
+      );
     } else {
       await OrderProduct.create({
         ProductId: productId,
@@ -164,21 +228,20 @@ class ProductController {
 
   async deleteFromCart(req, res, next) {
     const querySchema = Joi.object({
-      orderProductId: Joi.number().required()
+      orderProductId: Joi.number().required(),
     });
 
     const { orderProductId } = await querySchema.validateAsync(req.query);
 
     const item = await OrderProduct.destroy({
       where: {
-          id: orderProductId,
-          OrderId: null // Перевірка, що товар не входить до замовлення
-      }
+        id: orderProductId,
+        OrderId: null, // Перевірка, що товар не входить до замовлення
+      },
     });
 
     return item;
   }
-
 
   async cartList(req, res, next) {
     const userId = req.user.id;
@@ -188,7 +251,7 @@ class ProductController {
         UserId: userId,
         OrderId: null,
       },
-      include: { model: Product }
+      include: { model: Product },
     });
 
     return list;
@@ -205,7 +268,7 @@ class ProductController {
     });
 
     if (orderProductList) {
-      throw new Error('No products in cart');
+      throw new Error("No products in cart");
     }
 
     const order = await Order.create({
@@ -215,13 +278,16 @@ class ProductController {
     });
 
     for (let index = 0; index < orderProductList.length; index++) {
-      await OrderProduct.update({
-        orderId: order.id,
-      }, {
-        where: {
-          id: orderProductList[index].id,
+      await OrderProduct.update(
+        {
+          orderId: order.id,
         },
-      });
+        {
+          where: {
+            id: orderProductList[index].id,
+          },
+        }
+      );
     }
 
     return order;
