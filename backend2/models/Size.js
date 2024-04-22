@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize) => {
   });
 
   Size.associate = (models) => {
-    Size.belongsToMany(models.Product, { through: models.ProductSize });
+    // Size.belongsToMany(models.Product, { through: models.ProductSize });
   };
 
   return Size;

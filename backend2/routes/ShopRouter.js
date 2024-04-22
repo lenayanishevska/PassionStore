@@ -11,7 +11,7 @@ const router = new Router();
 router.get("/products/list", wrapAsync(productController.list));
 router.post("/products/addProductToCart", authMiddleware, wrapAsync(productController.addToCart));
 router.get("/products/cartProductList", authMiddleware, wrapAsync(productController.cartList));
-router.get("/products/createOrder", authMiddleware, wrapAsync(productController.createOrder));
+router.post("/products/createOrder", authMiddleware, wrapAsync(productController.createOrder));
 router.post("/products/create", authMiddleware, wrapAsync(productController.create));
 router.get("/products/getById", wrapAsync(productController.getById));
 router.delete("/products/deleteFromCart", authMiddleware, wrapAsync(productController.deleteFromCart));
@@ -28,8 +28,8 @@ router.get("/pages/item", wrapAsync(pageController.item));
 router.post("/pages/create", authMiddleware, wrapAsync(pageController.create));
 
 router.post("/attributes/create", authMiddleware, wrapAsync(productController.createAttribute));
-router.post("/options/create", authMiddleware, wrapAsync(productController.createOption));
-router.post("/options/createProductOption", authMiddleware, wrapAsync(productController.createProductOption));
+router.post("/sizes/create", authMiddleware, wrapAsync(productController.createSize));
+router.post("/sizes/createProductSize", authMiddleware, wrapAsync(productController.createProductSize));
 
 
 module.exports = router;

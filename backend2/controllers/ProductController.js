@@ -14,6 +14,8 @@ const {
   Manufacturer,
   ProductAttribute,
   ProductOption,
+  Size,
+  ProductSize
 } = require("../models");
 
 class ProductController {
@@ -140,20 +142,14 @@ class ProductController {
       ],
     });
 
-    const options = await ProductOption.findAll({
+    const options = await ProductSize.findAll({
       where: {
         productId,
       },
       include: [
         {
-          model: OptionValue,
-          as: 'optionValue',
-          include: [
-            {
-              model: Option,
-              as: 'option',
-            },
-          ],
+          model: Size,
+          as: 'size',
         },
       ],
     });
@@ -165,9 +161,8 @@ class ProductController {
         value: attribute.value,
       })),
       options: options.map(option => ({
-        id: option.optionValue.id,
-        value: option.optionValue.value,
-        name: option.optionValue.option.name,
+        id: option.id,
+        name: option.size.name,
       })),
     };
   }
@@ -237,7 +232,7 @@ class ProductController {
     const item = await OrderProduct.destroy({
       where: {
         id: orderProductId,
-        OrderId: null, // Перевірка, що товар не входить до замовлення
+        OrderId: null,
       },
     });
 
@@ -261,27 +256,42 @@ class ProductController {
   async createOrder(req, res, next) {
     const userId = req.user.id;
 
-    const orderProductList = await OrderProduct.findOne({
+    console.log("User ID: ", userId)
+
+    const orderProductList = await OrderProduct.findAll({
       where: {
-        userId,
-        orderId: null,
+        UserId: userId,
+        OrderId: null,
       },
+      include: [{ model: Product }],
     });
 
-    if (orderProductList) {
+    console.log("................... ",orderProductList);
+
+    if (!orderProductList) {
       throw new Error("No products in cart");
     }
 
+    let totalAmount = 0;
+    for (let index = 0; index < orderProductList.length; index++) {
+      totalAmount += orderProductList[index].amount; 
+    }
+
+    const currentDate = new Date();
+
+    console.log("Total Amount: ", totalAmount, "Date: ", currentDate);
+
     const order = await Order.create({
-      total_amount: 1,
+      total_amount: totalAmount,
       status: "Processing",
-      userId,
+      UserId: userId,
+      date: currentDate,
     });
 
     for (let index = 0; index < orderProductList.length; index++) {
       await OrderProduct.update(
         {
-          orderId: order.id,
+          OrderId: order.id,
         },
         {
           where: {
@@ -308,42 +318,36 @@ class ProductController {
     return attribute;
   }
 
-  async createOption(req, res, next) {
+  async createSize(req, res, next) {
     const bodySchema = Joi.object({
       name: Joi.string().required(),
-      values: Joi.array().items(Joi.string()),
     });
 
-    const { name, values } = await bodySchema.validateAsync(req.body);
+    const { name } = await bodySchema.validateAsync(req.body);
 
-    const option = await Option.create({
+    const size = await Size.create({
       name,
     });
 
-    for (let index = 0; index < values.length; index++) {
-      await OptionValue.create({
-        optionId: option.id,
-        value: values[index],
-      });
-    }
-
-    return option;
+    return size;
   }
 
-  async createProductOption(req, res, next) {
+  async createProductSize(req, res, next) {
     const bodySchema = Joi.object({
       productId: Joi.number().required(),
-      optionValueId: Joi.number().required(),
+      sizeId: Joi.number().required(),
+      quantity: Joi.number().required()
     });
 
-    const { productId,optionValueId } = await bodySchema.validateAsync(req.body);
+    const { productId, sizeId, quantity } = await bodySchema.validateAsync(req.body);
 
-    const productOption = await ProductOption.create({
-      productId: productId,
-      optionValueId: optionValueId,
+    const productSize = await ProductSize.create({
+      ProductId: productId,
+      SizeId: sizeId,
+      quantity: quantity
     });
 
-    return productOption;
+    return productSize;
   }
 }
 

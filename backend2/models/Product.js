@@ -34,6 +34,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(255),
         allowNull: true,
       },
+      quantity: {
+        field: "quantity",
+        type: Sequelize.INTEGER(),
+        allowNull: true,
+      },
     },
     {
       timestamps: false,
@@ -45,7 +50,7 @@ module.exports = (sequelize, Sequelize) => {
     Product.belongsTo(models.Category);
     Product.belongsTo(models.Manufacturer);
     Product.hasOne(models.OrderProduct);
-    Product.belongsToMany(models.Size, { through: models.ProductSize });
+    // Product.belongsToMany(models.Size, { through: models.ProductSize });
     Product.belongsToMany(models.Attribute, {
       through: models.ProductAttribute,
     });
