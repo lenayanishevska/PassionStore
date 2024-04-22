@@ -138,6 +138,7 @@ class UserController {
     }
 
     const userAddress = await UserAddress.findOne({where: {id: userAddressId}});
+    console.log(userAddress);
 
     return userAddress;
   }

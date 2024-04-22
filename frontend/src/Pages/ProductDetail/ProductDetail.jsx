@@ -7,19 +7,37 @@ import { useGetProductByIdQuery } from '../../redux/Api/ProductsApi.js';
 import { useSelector} from 'react-redux';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
+import { Panel } from 'primereact/panel';
+import { InputNumber } from 'primereact/inputnumber';
 import { useNavigate } from 'react-router-dom';
 import { useAddProductToCartMutation } from '../../redux/Api/OderApi.js';
 
 export const ProductDetail = () => {
-  const [quantity, setQuantity] = useState("1");
+  const [quantity, setQuantity] = useState(1);
   const [sizeId, setSizeId] = useState(null);
+  const [visible, setVisible] = useState(false);
+
+  const toastBC = useRef(null);
+  const refs = {
+    description: useRef(null),
+    brand: useRef(null),
+    material: useRef(null),
+  };
+  const navigate = useNavigate();
   const { productId } = useParams();
   const user = useSelector(state => state.userLogin.userInfo);
-  const [visible, setVisible] = useState(false);
-  const toastBC = useRef(null);
-  const navigate = useNavigate();
-
   const [addProductToCart] = useAddProductToCartMutation();
+
+  const { data, error, isLoading } = useGetProductByIdQuery({ productId: productId });
+  const product = data ? data.data : '';
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  const name = product.product.name.toUpperCase();
+  const image = 'http://localhost:5001/' + product.product.image_url;
+  const sizes = product.options;
+  const attribetes = product.attributes;
 
   const clear = () => {
     toastBC.current.clear();
@@ -30,12 +48,6 @@ export const ProductDetail = () => {
     clear();
     navigate('/login');
   }
-
-  const { data, error, isLoading } = useGetProductByIdQuery({ productId: productId });
-  const product = data ? data.data : '';
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
 
   const handleAddToCart = async () => {
     if(user) {
@@ -68,28 +80,10 @@ export const ProductDetail = () => {
     }
   }
 
-  const name = product.name.toUpperCase();
-
-  const image = 'http://localhost:5001/' + product.image_url;
-
-  const sizes = [
-    {
-      id: 1,
-      name: "S",
-    },
-    {
-      id: 2,
-      name: "M",
-    },
-    {
-      id: 3,
-      name: "L",
-    }
-  ];
-
-  
   return (
     <div className='product-detail-page flex-row'>
+
+      {/* Image Slider */}
       <div className="product-images ">
         <Slide>
               <div className="each-slide-effect">
@@ -98,13 +92,15 @@ export const ProductDetail = () => {
               </div>
         </Slide>
       </div>
+
+
       <div className="product-info flex-column">
 
         <div className="product-header flex-row">
 
           <h2>{name}</h2>
           <div className="product-price">
-            $ {product.price}
+            $ {product.product.price}
           </div>
 
         </div>
@@ -129,10 +125,11 @@ export const ProductDetail = () => {
 
               <h3>SIZE</h3>
 
+
               <div className="size-options flex-row">
                 {sizes.map((size, index) => {
                   return (
-                    <div className='size' key={size.id} onClick={() => {setSizeId(size.id)}} style={{background: sizeId === size.id ? 'var(--beige-color)' : 'inherit'}}>{size.name}</div>
+                    <div className='size' key={size.id} onClick={() => {setSizeId(size.id)}} style={{background: sizeId === size.id ? 'var(--beige-color)' : 'inherit'}}>{size.value}</div>
                   )
                 })}
               </div>
@@ -140,32 +137,44 @@ export const ProductDetail = () => {
             </div>
 
           </div>
-
           <input type="number" name="quantity" id="quantity" min="0" value={quantity} onChange={(e) => {setQuantity(e.target.value)}}/>
 
-          <button onClick={handleAddToCart}>Add to cart</button>
+          <button className='add-to-cart-button' onClick={handleAddToCart}>Add to cart</button>
 
         </div>
+
         <Toast ref={toastBC} position="top-center" className={visible ? "toast-custom" : ""} onRemove={clear} />
         <hr />
 
         <div className="product-attribes flex-column">
-
-          <h3>DESCRIPTION</h3>
-          <p>{product.description}</p>
-          <h3>Brand</h3>
-          <p>{product.Manufacturer.name}</p>
-
+          <Panel ref={refs.description} header="DESCRIPTION" toggleable collapsed={true}>
+              <p className="m-0">
+                {product.product.description}
+              </p>
+          </Panel>
         </div>
 
         <hr />
 
         <div className="product-attribes flex-column">
-
-          <h3>MATERIALS</h3>
-          <p>Cotton</p>
-
+          <Panel ref={refs.brand} header="BRAND" toggleable collapsed={true}>
+              <p className="m-0">
+                {product.product.Manufacturer.name}
+              </p>
+          </Panel>
         </div>
+
+        <hr />
+
+        <div className="product-attribes flex-column">
+          <Panel ref={refs.material} header="MATERIAL" toggleable collapsed={true}>
+              <p className="m-0">
+                {product.product.Manufacturer.name}
+              </p>
+          </Panel>
+        </div>
+
+        <hr />
 
       </div>
 

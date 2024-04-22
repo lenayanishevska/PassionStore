@@ -19,10 +19,12 @@ export const Profile = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  const { data, refetch} = useGetAddressQuery(user.id);
+  const { data, refetch} = useGetAddressQuery(user.data.id);
   const address = (data === undefined || data.success === false) ? '' : data.data;
+;
 
   const [addAddress] = useAddAddressMutation({});
+  
 
   useEffect(() => {
     refetch();
@@ -46,22 +48,22 @@ export const Profile = () => {
 
   return (
     <div className='profile flex-column'>
-      <div className="profile-user-header"><h3>HELLO, {user.first_name.toUpperCase()}</h3></div>
+      <div className="profile-user-header"><h3>HELLO, {user.data.first_name.toUpperCase()}</h3></div>
       <div className="profile-details flex-column">
         <div className="user-info flex-column">
           <span>My Profile Details</span>
           <hr />
           <div className="details-info flex-column">
             <span>Email:</span>
-            <p>{user.email}</p>
+            <p>{user.data.email}</p>
           </div>
           <div className="details-info flex-column">
             <span>First Name:</span>
-            <p>{user.first_name}</p>
+            <p>{user.data.first_name}</p>
           </div>
           <div className="details-info flex-column">
             <span>Last Name:</span>
-            <p>{user.last_name}</p>
+            <p>{user.data.last_name}</p>
           </div>
         </div>
         <hr />
@@ -165,7 +167,7 @@ export const Profile = () => {
         <hr />
         <div className="profile-buttons flex-row">
           {
-            user.is_admin ?<Link to='/admin'><button className='admin-button'>Admin Panel</button></Link> : <></>
+            user.data.is_admin ?<Link to='/admin'><button className='admin-button'>Admin Panel</button></Link> : <></>
           }
           <button className='lodout-button'>Log out</button>
         </div>
