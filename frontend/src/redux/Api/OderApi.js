@@ -5,7 +5,7 @@ export const orderApi = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: 'http://localhost:5001/api/',
         prepareHeaders: (headers, { getState }) => {
-            const token = getState().userLogin.userInfo.token;
+            const token = getState().userLogin.userInfo.data.token;
             if (token) {
             headers.set('Authorization', `Bearer ${token}`);
             }

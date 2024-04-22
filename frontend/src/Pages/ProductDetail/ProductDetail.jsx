@@ -26,6 +26,7 @@ export const ProductDetail = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
   const user = useSelector(state => state.userLogin.userInfo);
+  console.log(user.data.id);
   const [addProductToCart] = useAddProductToCartMutation();
 
   const { data, error, isLoading } = useGetProductByIdQuery({ productId: productId });
@@ -37,7 +38,7 @@ export const ProductDetail = () => {
   const name = product.product.name.toUpperCase();
   const image = 'http://localhost:5001/' + product.product.image_url;
   const sizes = product.options;
-  const attribetes = product.attributes;
+  const attributes = product.attributes;
 
   const clear = () => {
     toastBC.current.clear();
@@ -52,9 +53,9 @@ export const ProductDetail = () => {
   const handleAddToCart = async () => {
     if(user) {
       if(sizeId) {
-        console.log("user: ", user.id, " quantity: ", quantity, " size: ", sizeId, "product: ", product.id);
+        console.log("user: ", user.data.id, " quantity: ", quantity, " size: ", sizeId, "product: ", product.product.id);
         const body = { productId, quantity, sizeId };
-        const res = await addProductToCart({ body, userId: user.id }).unwrap();
+        const res = await addProductToCart({ body, userId: user.data.id }).unwrap();
         navigate('/cart');
       }
       else {
@@ -129,7 +130,7 @@ export const ProductDetail = () => {
               <div className="size-options flex-row">
                 {sizes.map((size, index) => {
                   return (
-                    <div className='size' key={size.id} onClick={() => {setSizeId(size.id)}} style={{background: sizeId === size.id ? 'var(--beige-color)' : 'inherit'}}>{size.value}</div>
+                    <div className='size' key={size.id} onClick={() => {setSizeId(size.id)}} style={{background: sizeId === size.id ? 'var(--beige-color)' : 'inherit'}}>{size.name}</div>
                   )
                 })}
               </div>
@@ -167,9 +168,9 @@ export const ProductDetail = () => {
         <hr />
 
         <div className="product-attribes flex-column">
-          <Panel ref={refs.material} header="MATERIAL" toggleable collapsed={true}>
+          <Panel ref={refs.material} header="DETAILS" toggleable collapsed={true}>
               <p className="m-0">
-                {product.product.Manufacturer.name}
+                {product.attributes ? product.attributes : ''}
               </p>
           </Panel>
         </div>
