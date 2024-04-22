@@ -27,7 +27,9 @@ router.get("/pages/list", authMiddleware, wrapAsync(pageController.list));
 router.get("/pages/item", wrapAsync(pageController.item));
 router.post("/pages/create", authMiddleware, wrapAsync(pageController.create));
 
-router.post("/attributes/create", authMiddleware, wrapAsync(pageController.createAttribute));
-router.post("/options/create", authMiddleware, wrapAsync(pageController.createOption));
+router.post("/attributes/create", authMiddleware, wrapAsync(productController.createAttribute));
+router.post("/options/create", authMiddleware, wrapAsync(productController.createOption));
+router.post("/options/createProductOption", authMiddleware, wrapAsync(productController.createProductOption));
+
 
 module.exports = router;

@@ -165,6 +165,7 @@ class ProductController {
         value: attribute.value,
       })),
       options: options.map(option => ({
+        id: option.optionValue.id,
         value: option.optionValue.value,
         name: option.optionValue.option.name,
       })),
@@ -327,6 +328,22 @@ class ProductController {
     }
 
     return option;
+  }
+
+  async createProductOption(req, res, next) {
+    const bodySchema = Joi.object({
+      productId: Joi.number().required(),
+      optionValueId: Joi.number().required(),
+    });
+
+    const { productId,optionValueId } = await bodySchema.validateAsync(req.body);
+
+    const productOption = await ProductOption.create({
+      productId: productId,
+      optionValueId: optionValueId,
+    });
+
+    return productOption;
   }
 }
 

@@ -100,7 +100,7 @@
     background-color: var(--beige-color);
 }
 
-.product-info-details button {
+.add-to-cart-button {
     width: 100%;
     height: 55px;
     font-size: 20px;
@@ -110,6 +110,12 @@
     color: var(--base-color);
     background-color: rgba(30, 30, 30, 0.9);
     border-radius: 20px;
+}
+
+.add-to-cart-button:hover {
+    border: 2px solid rgba(53, 52, 52, 0.9);
+    background-color: rgba(53, 52, 52, 0.4);
+    color: var(--light-black-color);
 }
 
 .product-attribes {

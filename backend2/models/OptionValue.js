@@ -23,7 +23,6 @@ module.exports = (sequelize, Sequelize) => {
   });
 
   OptionValue.associate = (models) => {
-    OptionValue.belongsToMany(models.Product, { through: models.ProductOption });
 
     OptionValue.belongsTo(models.Option, {
       as: 'option',
