@@ -194,6 +194,7 @@ class ProductController {
       where: {
         ProductId: productId,
         UserId: userId,
+        OrderId: null,
       },
     });
 
