@@ -17,16 +17,26 @@ class AdminController {
     }, 0);
     const orderIds = orders.map(order => order.id);
 
-    const orderProductCount = await OrderProduct.count({
+    const orderProducts = await OrderProduct.findAll({
       where: {
-        id: orderIds,
+        OrderId: orderIds,
       },
     });
+
+    // Сума усіх товарів у всіх замовленнях за поточний місяць
+    const totalProductCount = orderProducts.reduce((val, orderProduct) => {
+      return orderProduct.quantity + val;
+    }, 0);
+
+    const currentMonth = moment().format('MMMM');
+    const currentYear = moment().format('YYYY');
 
     return {
       totalAmountSum,
       orderCount,
-      orderProductCount,
+      totalProductCount,
+      currentMonth,
+      currentYear
     };
   }
 }

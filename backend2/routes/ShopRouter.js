@@ -19,7 +19,7 @@ router.delete("/products/deleteFromCart", authMiddleware, wrapAsync(productContr
 router.get("/categories/list", wrapAsync(categoryController.list));
 router.post("/categories/create", authMiddleware, wrapAsync(categoryController.create));
 
-router.get("/expenses/list", wrapAsync(expensesController.list));
+router.get("/expenses/categoriesList", wrapAsync(expensesController.categoriesList));
 router.post("/expenses/create", authMiddleware, wrapAsync(expensesController.create));
 router.post("/expenses/createCategory", authMiddleware, wrapAsync(expensesController.createCategory));
 
