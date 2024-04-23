@@ -1,7 +1,8 @@
 const { Expense, ExpensesCategory} = require('../models');
+const Joi = require("joi");
 
 class ExpensesController {
-  async list(req, res, next) {
+  async categoriesList(req, res, next) {
     const list = await ExpensesCategory.findAll();
 
     return list;
@@ -26,6 +27,7 @@ class ExpensesController {
   }
 
   async create(req, res, next) {
+    console.log("Body:", req.body);
     const bodySchema = Joi.object({
       categoryId: Joi.number().required(),
       amount: Joi.number().required(),

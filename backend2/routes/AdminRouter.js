@@ -5,6 +5,6 @@ const wrapAsync = require('../middleware/WrapAsync');
 
 const router = new Router();
 
-router.post("/monthInfo"/*, authMiddleware*/, wrapAsync(monthController.monthInfo));
+router.get("/monthInfo"/*, authMiddleware*/, wrapAsync(monthController.monthInfo));
 
 module.exports = router;

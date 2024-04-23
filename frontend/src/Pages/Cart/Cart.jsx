@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import './Cart.css'
 import { CartProduct } from '../../Components/CartProduct/CartProduct'
 import { useCreateOrderMutation, useGetOrderProductsQuery } from '../../redux/Api/OderApi'
-import { useSelector} from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { setOrderInfo } from '../../redux/Reducers/OrderReducer';
 
 export const Cart = () => {
   const user = useSelector(state => state.userLogin.userInfo);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [createOrder] = useCreateOrderMutation();
 
@@ -22,6 +24,8 @@ export const Cart = () => {
   const handleCreateOrder = async () => {
     const res = await createOrder({ userId: user.data.id }).unwrap();
     console.log(res);
+    dispatch(setOrderInfo(res));
+    navigate('/orderInfo');
   }
 
   useEffect(() => {

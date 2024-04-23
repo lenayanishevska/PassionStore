@@ -11,6 +11,7 @@ import { Registration } from './Pages/Registration/Registration'
 import { Profile } from './Pages/Profile/Profile'
 import { Admin } from './Pages/Admin/Admin';
 import { Page } from './Pages/Page';
+import { OrderInfo } from './Pages/OrderInfo/OrderInfo'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path='/products/:category/:productId' element={<ProductDetail/>}></Route>
 
         <Route path='/cart' element={<Cart/>}></Route>
+        <Route path='/orderInfo' element={<OrderInfo/>}></Route>
         <Route path='/login' element={<Login/>} ></Route>
         <Route path='/profile' element={<Profile/>} ></Route>
         <Route path='/registration' element={ <Registration/>}></Route>

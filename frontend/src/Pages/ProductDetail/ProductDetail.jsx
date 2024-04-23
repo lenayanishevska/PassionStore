@@ -26,7 +26,6 @@ export const ProductDetail = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
   const user = useSelector(state => state.userLogin.userInfo);
-  console.log(user.data.id);
   const [addProductToCart] = useAddProductToCartMutation();
 
   const { data, error, isLoading } = useGetProductByIdQuery({ productId: productId });

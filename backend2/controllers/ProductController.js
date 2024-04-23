@@ -2,6 +2,7 @@ const Joi = require("joi");
 const uuid = require("uuid");
 const path = require("path");
 const { Op } = require("sequelize");
+const moment = require('moment');
 
 const {
   Product,
@@ -257,8 +258,6 @@ class ProductController {
   async createOrder(req, res, next) {
     const userId = req.user.id;
 
-    console.log("User ID: ", userId)
-
     const orderProductList = await OrderProduct.findAll({
       where: {
         UserId: userId,
@@ -266,8 +265,6 @@ class ProductController {
       },
       include: [{ model: Product }],
     });
-
-    console.log("................... ",orderProductList);
 
     if (!orderProductList) {
       throw new Error("No products in cart");
@@ -278,7 +275,7 @@ class ProductController {
       totalAmount += orderProductList[index].amount; 
     }
 
-    const currentDate = new Date();
+    const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
 
     console.log("Total Amount: ", totalAmount, "Date: ", currentDate);
 

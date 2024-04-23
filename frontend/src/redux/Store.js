@@ -4,6 +4,9 @@ import { categoriesApi } from "./Api/CategoriesApi";
 import { productsApi } from "./Api/ProductsApi";
 import { userAddressApi } from "./Api/UserAddressApi";
 import { orderApi } from "./Api/OderApi";
+import { expensesApi } from "./Api/ExpesesApi";
+import { adminApi } from "./Api/AdminApi";
+import OrderSlice from "./Reducers/OrderReducer";
 
 const rootReducer = combineReducers({
     userLogin : user.LoginReducer,
@@ -12,7 +15,9 @@ const rootReducer = combineReducers({
     [productsApi.reducerPath]: productsApi.reducer,
     [userAddressApi.reducerPath]: userAddressApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
-    
+    [expensesApi.reducerPath]: expensesApi.reducer,
+    [adminApi.reducerPath]: adminApi.reducer,
+    orderInfo: OrderSlice,
 });
 
 const userInfoFromStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
@@ -28,5 +33,5 @@ export const store = configureStore({
         getDefaultMiddleware({
             serializableCheck:false,
             immutableCheck: false,
-        }).concat(categoriesApi.middleware, productsApi.middleware, userAddressApi.middleware, orderApi.middleware),
+        }).concat(categoriesApi.middleware, productsApi.middleware, userAddressApi.middleware, orderApi.middleware, expensesApi.middleware, adminApi.middleware),
 });
