@@ -29,6 +29,12 @@ export const orderApi = createApi({
                 method: 'DELETE',
             }),
         }),
+        createOrder: build.mutation({
+            query: ({ userId }) => ({
+                url: `shop/products/createOrder?${userId ? `userId=${userId}` : ''}`,
+                method: 'POST',
+            }),
+        }),
     }),
 });
-export const {useGetOrderProductsQuery, useAddProductToCartMutation, useDeleteProductFromCartMutation} = orderApi;
+export const {useGetOrderProductsQuery, useAddProductToCartMutation, useDeleteProductFromCartMutation, useCreateOrderMutation} = orderApi;

@@ -1,19 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import './Cart.css'
 import { CartProduct } from '../../Components/CartProduct/CartProduct'
-import { useGetOrderProductsQuery } from '../../redux/Api/OderApi'
+import { useCreateOrderMutation, useGetOrderProductsQuery } from '../../redux/Api/OderApi'
 import { useSelector} from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 export const Cart = () => {
   const user = useSelector(state => state.userLogin.userInfo);
+  const navigate = useNavigate();
+
+  const [createOrder] = useCreateOrderMutation();
 
   if(!user) {
     console.log("User was not found");
   }
 
-  const userId = user.id;
+  const userId = user.data.id;
   const { data, refetch} = useGetOrderProductsQuery(userId);
   const cartProducts = data ? data.data : [];
+
+  const handleCreateOrder = async () => {
+    const res = await createOrder({ userId: user.data.id }).unwrap();
+    console.log(res);
+  }
 
   useEffect(() => {
     refetch();
@@ -58,7 +67,13 @@ export const Cart = () => {
             <span>Total price: </span>
             <div className="order-price">$ {total}</div>
           </div>
-          <button>Buy Now</button>
+          <button onClick={handleCreateOrder}>Buy Now</button>
+        </div>
+        <div className='back-to-shop' 
+          onClick={() => {
+            navigate('/');
+          }}>
+          Back to shopping
         </div>
       </div>
 

@@ -25,6 +25,7 @@
     background: rgb(113, 109, 105, 0.3);
     height: 90vh;
     justify-content: center;
+    gap: 5px;
 }
 
 .cart-summary-container {
@@ -93,4 +94,16 @@
 
 .table-headers hr {
     border: 1px solid rgba(184, 178, 170, 0.6);
+}
+
+.back-to-shop {
+    padding-left: 25px;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--red-color);
+    text-decoration: underline;
+}
+
+.back-to-shop:hover {
+    color: var(--pastel-red-color);
 }
