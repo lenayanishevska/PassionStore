@@ -3,6 +3,28 @@ const moment = require('moment');
 const { Order, OrderProduct } = require('../models');
 
 class AdminController {
+  async saleChart(req, res, next) {
+    let date = moment();
+    const values = [];
+    const names = [];
+    for (let index = 0; index < 12; index++) {
+      const startOfMonth = date.startOf('month');
+      const endOfMonth = date.endOf('month');
+      const orders = await Order.count({
+        where: {
+          date: { [Op.between]: [startOfMonth.format('YYYY-MM-DD HH:mm:ss'), endOfMonth.format('YYYY-MM-DD HH:mm:ss')] },
+        },
+      });
+      values.push(orders);
+      names.push(date.format('MMM YYYY'));
+      date = date.subtract(1, 'month');
+    }
+    return {
+      values,
+      names,
+    };
+  }
+
   async monthInfo(req, res, next) {
     const orders = await Order.findAll({
       where: {

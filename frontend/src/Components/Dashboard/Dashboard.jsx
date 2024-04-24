@@ -1,14 +1,31 @@
-import React, { useState } from 'react'
-import './Dashboard.css'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import './Dashboard.css';
 import Select from '@mui/material/Select';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useGetMonthInfoQuery } from '../../redux/Api/AdminApi';
 import { ExpensesForm } from './ExpensesForm';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const Dashboard = () => {
+  const [chartData, setChartData] = useState({names: ["MON 1", "Mon 2"], values: [1, 2]});
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
     const { data } = useGetMonthInfoQuery();
     const statistic = data ? data.data : '';
 
+  useEffect(() => {
+    setIsLoading(true);
+      axios.get('http://localhost:5001/api/admin/saleChart').then((data) => {
+        setIsError(false);
+        setIsLoading(false);
+        console.log(data.data.data);
+        setChartData(data.data.data);
+      }).catch((Error) => {
+        setIsError(true);
+        setIsLoading(false);
+      });
+  }, []);
 
   return (
     <div className='dashboard flex-column'>
@@ -41,8 +58,8 @@ export const Dashboard = () => {
         <div className="expenses-incomes flex-row">
             <div className="chart">
                 <BarChart
-                    xAxis={[{ scaleType: 'band', data: ['Jan', 'Feb', 'Mar','Apr','May','Jun','Jul', 'Aug', 'Sep','Oct','Nov','Des'] }]}
-                    series={[{ data: [100, 600, 300, 700, 500, 300, 400, 200, 500, 400, 1000, 800] }, { data: [200, 500, 600, 800, 500, 1000, 300, 600, 400, 700, 1000, 900] }]}
+                    xAxis={[{ scaleType: 'band', data: chartData.names }]}
+                    series={[{ data: chartData.values }]}
                     width={800}
                     height={400}
                     colorSet={['#6B292A', '#716D69']}
