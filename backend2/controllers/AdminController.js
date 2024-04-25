@@ -8,11 +8,11 @@ class AdminController {
     const values = [];
     const names = [];
     for (let index = 0; index < 12; index++) {
-      const startOfMonth = date.startOf('month');
-      const endOfMonth = date.endOf('month');
+      const startOfMonth = date.startOf('month').format('YYYY-MM-DD HH:mm:ss');
+      const endOfMonth = date.endOf('month').format('YYYY-MM-DD HH:mm:ss');
       const orders = await Order.count({
         where: {
-          date: { [Op.between]: [startOfMonth.format('YYYY-MM-DD HH:mm:ss'), endOfMonth.format('YYYY-MM-DD HH:mm:ss')] },
+          date: { [Op.between]: [startOfMonth, endOfMonth] },
         },
       });
       values.push(orders);
