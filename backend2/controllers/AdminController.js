@@ -1,14 +1,39 @@
-const { Op } = require('sequelize');
-const moment = require('moment');
-const { Order, OrderProduct } = require('../models');
+const { Op } = require("sequelize");
+const moment = require("moment");
+const { Order, OrderProduct } = require("../models");
 
 class AdminController {
   async orders(req, res, next) {
     const orders = await Order.findAll({
-
+      order: [["date", "DESC"]],
     });
 
     return orders;
+  }
+
+  async updateOrder(req, res, next) {
+    // @TODO validation
+    const { id, status } = req.body;
+
+    const order = await Order.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!order) {
+      throw new Error('Order not found');
+    }
+
+    await Order.update({
+      status,
+    }, {
+      where: {
+        id,
+      },
+    });
+
+    return true;
   }
 
   async saleChart(req, res, next) {
@@ -16,16 +41,16 @@ class AdminController {
     const values = [];
     const names = [];
     for (let index = 0; index < 12; index++) {
-      const startOfMonth = date.startOf('month').format('YYYY-MM-DD HH:mm:ss');
-      const endOfMonth = date.endOf('month').format('YYYY-MM-DD HH:mm:ss');
+      const startOfMonth = date.startOf("month").format("YYYY-MM-DD HH:mm:ss");
+      const endOfMonth = date.endOf("month").format("YYYY-MM-DD HH:mm:ss");
       const orders = await Order.count({
         where: {
           date: { [Op.between]: [startOfMonth, endOfMonth] },
         },
       });
       values.push(orders);
-      names.push(date.format('MMM YYYY'));
-      date = date.subtract(1, 'month');
+      names.push(date.format("MMM YYYY"));
+      date = date.subtract(1, "month");
     }
     return {
       values,
@@ -36,7 +61,9 @@ class AdminController {
   async monthInfo(req, res, next) {
     const orders = await Order.findAll({
       where: {
-        date: { [Op.gte]: moment.utc().startOf('month').format('YYYY-MM-DD HH:mm:ss') }
+        date: {
+          [Op.gte]: moment.utc().startOf("month").format("YYYY-MM-DD HH:mm:ss"),
+        },
       },
     });
 
@@ -45,7 +72,7 @@ class AdminController {
       console.log(order, val);
       return +order.total_amount + +val;
     }, 0);
-    const orderIds = orders.map(order => order.id);
+    const orderIds = orders.map((order) => order.id);
 
     const orderProducts = await OrderProduct.findAll({
       where: {
@@ -58,15 +85,15 @@ class AdminController {
       return orderProduct.quantity + val;
     }, 0);
 
-    const currentMonth = moment().format('MMMM');
-    const currentYear = moment().format('YYYY');
+    const currentMonth = moment().format("MMMM");
+    const currentYear = moment().format("YYYY");
 
     return {
       totalAmountSum,
       orderCount,
       totalProductCount,
       currentMonth,
-      currentYear
+      currentYear,
     };
   }
 }

@@ -11,7 +11,7 @@ export const OrderManager = () => {
   const [isLoading, setIsLoading] = useState(false);
   const statistic = data ? data.data : "";
 
-  useEffect(() => {
+  const reload = () => {
     setIsLoading(true);
     axios
       .get("http://localhost:5001/api/admin/orders")
@@ -24,11 +24,25 @@ export const OrderManager = () => {
         setIsError(true);
         setIsLoading(false);
       });
+  };
+
+  useEffect(() => {
+    reload();
   }, []);
 
   const completeOrder = (orderId) => {
-    alert('COMPLE ' + orderId);
-  }
+    axios({
+      method: "POST",
+      url: "http://localhost:5001/api/admin/updateOrder",
+      data: { id: orderId, status: "Completed" },
+    })
+      .then((data) => {
+        reload();
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  };
 
   return (
     <div className="dashboard flex-column">
@@ -47,18 +61,25 @@ export const OrderManager = () => {
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (<tr>
-            <td>{item.id}</td>
-            <td>{item.date}</td>
-            <td>{item.total_amount}</td>
-            <td>{item.status}</td>
-            <td>
-              {item.status === 'Processing' ? (
-                <button onClick={() => {completeOrder(item.id)}}>Complete ORDER</button>
-              ) : null}
-            </td>
-          </tr>))}
-          
+          {data.map((item) => (
+            <tr>
+              <td>{item.id}</td>
+              <td>{item.date}</td>
+              <td>{item.total_amount}</td>
+              <td>{item.status}</td>
+              <td>
+                {item.status === "Processing" ? (
+                  <button
+                    onClick={() => {
+                      completeOrder(item.id);
+                    }}
+                  >
+                    Complete ORDER
+                  </button>
+                ) : null}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
