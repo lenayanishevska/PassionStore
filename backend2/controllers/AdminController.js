@@ -1,19 +1,36 @@
 const { Op } = require("sequelize");
 const moment = require("moment");
 const { Order, OrderProduct } = require("../models");
+const Joi = require('joi');
 
 class AdminController {
   async orders(req, res, next) {
+    const querySchema = Joi.object({
+      itemPerPage: Joi.number().default(10),
+      page: Joi.number().default(0),
+      sort: Joi.string().valid('date').default('date'),
+    });
+
+    const { itemPerPage, page, sort } = await querySchema.validateAsync(req.query);
+
     const orders = await Order.findAll({
-      order: [["date", "DESC"]],
+      order: [
+        [sort, "DESC"],
+      ],
+      limit: itemPerPage,
+      offset: page * itemPerPage,
     });
 
     return orders;
   }
 
   async updateOrder(req, res, next) {
-    // @TODO validation
-    const { id, status } = req.body;
+    const bodySchema = Joi.object({
+      id: Joi.number().required(),
+      status: Joi.string().required(),
+    });
+
+    const { id, status } = await bodySchema.validateAsync(req.query);
 
     const order = await Order.findOne({
       where: {
