@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import { Dashboard } from '../../Components/Dashboard/Dashboard';
+import { OrderManager } from '../../Components/OrderManager/OrderManager';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -22,6 +23,11 @@ function TabPanel(props) {
       {value === 0 && (
         <div className="dashboard-panel">
           <Dashboard/>
+        </div>
+      )}
+      {value === 2 && (
+        <div className="dashboard-panel">
+          <OrderManager/>
         </div>
       )}
     </div>

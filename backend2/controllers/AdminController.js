@@ -3,6 +3,14 @@ const moment = require('moment');
 const { Order, OrderProduct } = require('../models');
 
 class AdminController {
+  async orders(req, res, next) {
+    const orders = await Order.findAll({
+
+    });
+
+    return orders;
+  }
+
   async saleChart(req, res, next) {
     let date = moment();
     const values = [];
