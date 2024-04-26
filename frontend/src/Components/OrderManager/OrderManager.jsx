@@ -4,23 +4,29 @@ import Select from "@mui/material/Select";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useGetMonthInfoQuery } from "../../redux/Api/AdminApi";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import ReactPaginate from 'react-paginate';
+import "react-paginate/theme/basic/react-paginate.css";
+import { current } from "@reduxjs/toolkit";
 
 export const OrderManager = () => {
-  const [data, setData] = useState([]);
+  const [pageCount, setPageCount] = useState(0);
+  const [page, setPage] = useState(0);
+  const [list, setList] = useState([]);
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const statistic = data ? data.data : "";
 
   const reload = () => {
     setIsLoading(true);
     axios
-      .get("http://localhost:5001/api/admin/orders")
-      .then((data) => {
+      .get(`http://localhost:5001/api/admin/orders?page=${page}&itemPerPage=10&sort=date`)
+      .then((response) => {
         setIsError(false);
         setIsLoading(false);
-        setData(data.data.data);
+        setList(response.data.data.list);
+        setPageCount(response.data.data.pageCount);
       })
-      .catch((Error) => {
+      .catch((error) => {
+        console.log(error);
         setIsError(true);
         setIsLoading(false);
       });
@@ -29,6 +35,10 @@ export const OrderManager = () => {
   useEffect(() => {
     reload();
   }, []);
+
+  useEffect(() => {
+    reload();
+  }, [page]);
 
   const completeOrder = (orderId) => {
     axios({
@@ -43,6 +53,10 @@ export const OrderManager = () => {
         alert(error);
       });
   };
+
+  const changePage = ({selected}) => {
+    setPage(selected);
+  }
 
   return (
     <div className="dashboard flex-column">
@@ -61,8 +75,8 @@ export const OrderManager = () => {
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
-            <tr>
+          {list.map((item) => (
+            <tr key={item.id}>
               <td>{item.id}</td>
               <td>{item.date}</td>
               <td>{item.total_amount}</td>
@@ -82,6 +96,18 @@ export const OrderManager = () => {
           ))}
         </tbody>
       </table>
+
+      <ReactPaginate
+        breakLabel="..."
+        nextLabel="next >"
+        onPageChange={changePage}
+        pageRangeDisplayed={5}
+        pageCount={pageCount}
+        previousLabel="< previous"
+        renderOnZeroPageCount={null}
+        className="react-paginate"
+        forcePage={page}
+      />
     </div>
   );
 };

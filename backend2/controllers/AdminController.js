@@ -13,7 +13,11 @@ class AdminController {
 
     const { itemPerPage, page, sort } = await querySchema.validateAsync(req.query);
 
-    const orders = await Order.findAll({
+    const totalCount = await await Order.count({});
+
+    const pageCount = Math.floor(totalCount / itemPerPage);
+
+    const list = await Order.findAll({
       order: [
         [sort, "DESC"],
       ],
@@ -21,7 +25,12 @@ class AdminController {
       offset: page * itemPerPage,
     });
 
-    return orders;
+    return {
+      totalCount,
+      itemPerPage,
+      pageCount,
+      list,
+    };
   }
 
   async updateOrder(req, res, next) {
