@@ -53,7 +53,6 @@ class ProductController {
         const manufacturerInstance = await Manufacturer.findOne({
           where: { name: manufacturer },
         });
-        console.log("Manufacturer: ", manufacturerInstance.id);
         if (manufacturerInstance) {
           where.ManufacturerId = manufacturerInstance.id; // Додаємо умову для ідентифікатора виробника
         }
@@ -63,11 +62,9 @@ class ProductController {
       }
     }
 
-    console.log("Filters ................", where);
 
     let order = [];
     if (sort) {
-      // Якщо переданий параметр сортування, додати його до умови сортування
       const { sortField, sortOrder } = JSON.parse(sort);
       order = [[sortField, sortOrder]];
     }

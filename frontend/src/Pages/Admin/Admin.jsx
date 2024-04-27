@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import { Dashboard } from '../../Components/Dashboard/Dashboard';
 import { OrderManager } from '../../Components/OrderManager/OrderManager';
+import { Orders } from '../../Components/Orders/Orders';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -28,6 +29,11 @@ function TabPanel(props) {
       {value === 2 && (
         <div className="dashboard-panel">
           <OrderManager/>
+        </div>
+      )}
+      {value === 1 && (
+        <div className="orders-panel">
+          <Orders/>
         </div>
       )}
     </div>
