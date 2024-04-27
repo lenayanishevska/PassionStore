@@ -5,25 +5,49 @@ const Joi = require('joi');
 
 class AdminController {
   async orders(req, res, next) {
+    console.log(req.query);
     const querySchema = Joi.object({
       itemPerPage: Joi.number().default(10),
       page: Joi.number().default(0),
-      sort: Joi.string().valid('date').default('date'),
+      sort: Joi.string().optional(),
+      filters: Joi.string().optional(),
     });
 
-    const { itemPerPage, page, sort } = await querySchema.validateAsync(req.query);
+    const { itemPerPage, page, sort, filters } = await querySchema.validateAsync(req.query);
 
-    const totalCount = await await Order.count({});
+    // const totalCount = await Order.count({});
 
-    const pageCount = Math.floor(totalCount / itemPerPage);
+    const where = {};
+
+    if (filters) {
+      const { status, fromPrice, toPrice } =
+        JSON.parse(filters); // Витягуємо параметри фільтру з об'єкта filter
+
+      if (status) {
+        where.status = status;
+      }
+
+      if (fromPrice && toPrice) {
+        where.total_amount = { [Op.between]: [fromPrice, toPrice] };
+      }
+    }
+
+    let order = [];
+    if (sort) {
+      const { sortField, sortOrder } = JSON.parse(sort);
+      order = [[sortField, sortOrder]];
+    }
 
     const list = await Order.findAll({
-      order: [
-        [sort, "DESC"],
-      ],
+      where,
+      order,
       limit: itemPerPage,
       offset: page * itemPerPage,
     });
+
+    const totalCount = await Order.count({ where });
+
+    const pageCount = Math.ceil(totalCount/ itemPerPage);
 
     return {
       totalCount,
@@ -34,12 +58,13 @@ class AdminController {
   }
 
   async updateOrder(req, res, next) {
+    console.log(req.body);
     const bodySchema = Joi.object({
       id: Joi.number().required(),
       status: Joi.string().required(),
     });
 
-    const { id, status } = await bodySchema.validateAsync(req.query);
+    const { id, status } = await bodySchema.validateAsync(req.body);
 
     const order = await Order.findOne({
       where: {

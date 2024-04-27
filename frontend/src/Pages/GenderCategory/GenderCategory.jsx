@@ -32,6 +32,7 @@ export const GenderCategory = () => {
   const handleReset = () => {
     setFilterParams({});
     setManufacturer(null);
+    setValue([1, 100]);
   };
 
 
@@ -50,10 +51,7 @@ export const GenderCategory = () => {
   };
 
   const header = category === '1'? 'Men\'s': 'Women\'s';
-
-  const materials = [{name: 'Cotton'}, {name:'Jeans'}, {name:'Silk'}, {name:'Wool'}, {name:'Leather'}, {name:'Cashemire'}];
   const brands = [{name: 'Zara'}, {name:'H&M'}, {name:'Mango'}, {name:'Bershka'}, {name:'Reserved'}];
-  const prices = [{name: '$5 - $10'}, {name:'$10 - $50'}, {name:'$50 - $100'}, {name:'$100 - $500'}, {name:'$500 - ...'}];
 
   return (
     <div className='catalog-page'>
