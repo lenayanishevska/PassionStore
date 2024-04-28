@@ -1,11 +1,11 @@
 const { Op } = require("sequelize");
 const moment = require("moment");
-const { Order, OrderProduct } = require("../models");
+const { Order, OrderProduct, User, UserAddress, Income, Expense } = require("../models");
 const Joi = require('joi');
+const sequelize = require('sequelize');
 
 class AdminController {
   async orders(req, res, next) {
-    console.log(req.query);
     const querySchema = Joi.object({
       itemPerPage: Joi.number().default(10),
       page: Joi.number().default(0),
@@ -15,13 +15,11 @@ class AdminController {
 
     const { itemPerPage, page, sort, filters } = await querySchema.validateAsync(req.query);
 
-    // const totalCount = await Order.count({});
-
     const where = {};
 
     if (filters) {
       const { status, fromPrice, toPrice } =
-        JSON.parse(filters); // Витягуємо параметри фільтру з об'єкта filter
+        JSON.parse(filters); 
 
       if (status) {
         where.status = status;
@@ -57,6 +55,71 @@ class AdminController {
     };
   }
 
+  async users(req, res, next) {
+    const querySchema = Joi.object({
+      itemPerPage: Joi.number().default(10),
+      page: Joi.number().default(0),
+      sort: Joi.string().optional(),
+      filters: Joi.string().optional(),
+    });
+
+    const { itemPerPage, page, sort, filters } = await querySchema.validateAsync(req.query);
+
+    const where = {};
+
+    if (filters) {
+      const { status, fromPrice, toPrice } = JSON.parse(filters); 
+
+      // if (status) {
+      //   where.status = status;
+      // }
+
+      // if (fromPrice && toPrice) {
+      //   where.total_amount = { [Op.between]: [fromPrice, toPrice] };
+      // }
+    }
+
+    let order = [];
+    if (sort) {
+      const { sortField, sortOrder } = JSON.parse(sort);
+      order = [[sortField, sortOrder]];
+    }
+
+    const list = await User.findAll({
+      where,
+      order,
+      limit: itemPerPage,
+      offset: page * itemPerPage,
+      include: [
+        {
+          model: UserAddress,
+          required: false,
+          where: { UserId: sequelize.col('User.id') }, 
+        },
+        {
+          model: Order,
+          attributes: [],
+          required: false,
+          include: [],
+          duplicating: false,
+        }
+      ],
+      group: ['User.id'],
+    });
+    
+
+    const totalCount = await User.count({ where });
+
+    const pageCount = Math.ceil(totalCount / itemPerPage);
+
+    return {
+      totalCount,
+      itemPerPage,
+      pageCount,
+      list,
+    };
+}
+
   async updateOrder(req, res, next) {
     console.log(req.body);
     const bodySchema = Joi.object({
@@ -90,24 +153,32 @@ class AdminController {
   async saleChart(req, res, next) {
     let date = moment();
     const values = [];
+    const expenses = [];
     const names = [];
     for (let index = 0; index < 12; index++) {
       const startOfMonth = date.startOf("month").format("YYYY-MM-DD HH:mm:ss");
       const endOfMonth = date.endOf("month").format("YYYY-MM-DD HH:mm:ss");
-      const orders = await Order.count({
+      const incomes = await Income.sum('amount', {
         where: {
           date: { [Op.between]: [startOfMonth, endOfMonth] },
         },
       });
-      values.push(orders);
+      values.push(incomes);
+      const expensesSum = await Expense.sum('amount', {
+        where: {
+          date: { [Op.between]: [startOfMonth, endOfMonth] },
+        },
+      });
+      expenses.push(expensesSum);
       names.push(date.format("MMM YYYY"));
       date = date.subtract(1, "month");
     }
     return {
       values,
+      expenses,
       names,
     };
-  }
+}
 
   async monthInfo(req, res, next) {
     const orders = await Order.findAll({
@@ -119,10 +190,14 @@ class AdminController {
     });
 
     const orderCount = orders.length;
-    const totalAmountSum = orders.reduce((val, order) => {
-      console.log(order, val);
-      return +order.total_amount + +val;
-    }, 0);
+    // const totalAmountSum = orders.reduce((val, order) => {
+    //   console.log(order, val);
+    //   return +order.total_amount + +val;
+    // }, 0);
+
+    const totalAmountSum = await Income.sum('amount');
+
+
     const orderIds = orders.map((order) => order.id);
 
     const orderProducts = await OrderProduct.findAll({

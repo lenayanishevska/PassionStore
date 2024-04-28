@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./OrderManager.css"
 import ReactPaginate from 'react-paginate';
 import "react-paginate/theme/basic/react-paginate.css";
 import moment from 'moment'; 
@@ -13,7 +12,7 @@ import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
 
 
-export const OrderManager = () => {
+export const UserManager = () => {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(0);
   const [list, setList] = useState([]);

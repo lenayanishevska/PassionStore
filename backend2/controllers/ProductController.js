@@ -296,7 +296,10 @@ class ProductController {
       );
     }
 
-    return order;
+    return {
+      order,
+      orderProductList
+    };
   }
 
   async createAttribute(req, res, next) {

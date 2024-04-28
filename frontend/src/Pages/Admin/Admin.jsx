@@ -8,7 +8,8 @@ import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import { Dashboard } from '../../Components/Dashboard/Dashboard';
 import { OrderManager } from '../../Components/OrderManager/OrderManager';
-import { Orders } from '../../Components/Orders/Orders';
+import { UserManager } from '../../Components/UserManager/UserManager';
+import { AddProduct } from '../../Components/AddProduct/AddProduct';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -33,7 +34,12 @@ function TabPanel(props) {
       )}
       {value === 1 && (
         <div className="orders-panel">
-          <Orders/>
+          <UserManager/>
+        </div>
+      )}
+      {value === 3 && (
+        <div className="orders-panel">
+          <AddProduct/>
         </div>
       )}
     </div>
@@ -113,14 +119,15 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
         <StyledTab label="Dashboard" {...a11yProps(0)} />
         <StyledTab label="Users" {...a11yProps(1)} />
         <StyledTab label="Orders" {...a11yProps(2)} />
+        <StyledTab label="Add product" {...a11yProps(3)} />
       </StyledTabs>
       <TabPanel value={value} index={0}>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three
+      </TabPanel>
+      <TabPanel value={value} index={3}>
       </TabPanel>
     </Box>
   );
