@@ -16,23 +16,8 @@ export const OrderInfo = () => {
         navigate('/');
       };
 
-    const products = [
-        {
-            id: 1,
-            name: "Dress",
-            price: 29.99
-        },
-        {
-            id: 2,
-            name: "Dress",
-            price: 29.99
-        },
-        {
-            id: 3,
-            name: "Dress",
-            price: 29.99
-        }
-    ]
+    const products = orderInfo.data.orderProductList;
+
   return (
     <div className='order flex-column'>
     <div className="order-details flex-column">
@@ -44,8 +29,8 @@ export const OrderInfo = () => {
             {products.map((item) => {
                 return (
                     <div key={item.id} className="order-product-info flex-row">
-                        <span>{item.name}</span>
-                        <span>$ {item.price}</span>
+                        <span>{item.Product.name}</span>
+                        <span>$ {item.Product.price}</span>
                     </div>
                 )
             })}
@@ -53,11 +38,11 @@ export const OrderInfo = () => {
         <hr />
         <div className="order-product-info flex-row">
             <span>Total Amount:</span>
-            {orderInfo? <span>$ {orderInfo.data.total_amount}</span> : <></>}
+            {orderInfo? <span>$ {orderInfo.data.order.total_amount}</span> : <></>}
         </div>
         <div className="order-product-info flex-row">
             <span>Date:</span>
-            {orderInfo? <span> {moment(orderInfo.data.date).format('YYYY-MM-DD HH:mm:ss')}</span>: <></>}
+            {orderInfo? <span> {moment(orderInfo.data.order.date).format('YYYY-MM-DD HH:mm:ss')}</span>: <></>}
         </div>
       </div>
       <hr />

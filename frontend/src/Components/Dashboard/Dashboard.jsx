@@ -1,31 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Dashboard.css';
-import Select from '@mui/material/Select';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useGetMonthInfoQuery } from '../../redux/Api/AdminApi';
 import { ExpensesForm } from './ExpensesForm';
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const Dashboard = () => {
-  const [chartData, setChartData] = useState({names: ["MON 1", "Mon 2"], values: [1, 2]});
+  const [chartData, setChartData] = useState({names: ["MON 1", "Mon 2"], values: [1, 2], expenses: [1, 2]});
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-    const { data } = useGetMonthInfoQuery();
-    const statistic = data ? data.data : '';
+  const { data } = useGetMonthInfoQuery();
+  const statistic = data ? data.data : '';
+  const income = statistic.totalAmountSum;
+
+  const reload = () => {
+    setIsLoading(true);
+    axios.get('http://localhost:5001/api/admin/saleChart').then((data) => {
+      setIsError(false);
+      setIsLoading(false);
+      setChartData(data.data.data);
+    }).catch((Error) => {
+      setIsError(true);
+      setIsLoading(false);
+    });
+  }
 
   useEffect(() => {
-    setIsLoading(true);
-      axios.get('http://localhost:5001/api/admin/saleChart').then((data) => {
-        setIsError(false);
-        setIsLoading(false);
-        console.log(data.data.data);
-        setChartData(data.data.data);
-      }).catch((Error) => {
-        setIsError(true);
-        setIsLoading(false);
-      });
+    reload();
   }, []);
+
+  useEffect(() => {
+    reload();
+  }, [chartData]);
 
   return (
     <div className='dashboard flex-column'>
@@ -43,7 +49,7 @@ export const Dashboard = () => {
             </div>
             <div className="stat flex-column">
                 <h3>Month Income</h3>
-                <span className='orders-count'>{statistic.totalAmountSum}</span>
+                <span className='orders-count'>{income}</span>
                 <span className='month'>{statistic.currentMonth}, {statistic.currentYear}</span>
             </div>
             <div className="stat flex-column">
@@ -59,7 +65,7 @@ export const Dashboard = () => {
             <div className="chart">
                 <BarChart
                     xAxis={[{ scaleType: 'band', data: chartData.names }]}
-                    series={[{ data: chartData.values }]}
+                    series={[{ data: chartData.values }, { data: chartData.expenses }]}
                     width={800}
                     height={400}
                     colorSet={['#6B292A', '#716D69']}
