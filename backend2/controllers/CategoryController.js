@@ -21,7 +21,6 @@ class CategoryController {
   async create(req, res, next) {
     const name = req.body.name;
     const parentCategoryId = req.body.parentCategoryId;
-    // const gender = req.body.gender;
 
     if (!name) {
       throw new Error('Invalid data');

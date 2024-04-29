@@ -44,9 +44,11 @@ module.exports = (sequelize, Sequelize) => {
     User.belongsTo(models.UserAddress, {
       foreignKey: {
         allowNull: true,
+        onDelete: 'SET NULL'
       }
     });
-    User.hasMany(models.Order);
+    User.hasMany(models.Order, { onDelete: 'SET NULL' });
+    User.hasMany(models.OrderProduct, { onDelete: 'SET NULL' });
   };
 
   return User;

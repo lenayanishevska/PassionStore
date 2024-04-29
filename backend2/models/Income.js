@@ -24,7 +24,7 @@ module.exports = (sequelize, Sequelize) => {
     });
   
     Income.associate = (models) => {
-        Income.belongsTo(models.Order);
+        Income.belongsTo(models.Order, { onDelete: 'SET NULL' });
     };
   
     return Income;

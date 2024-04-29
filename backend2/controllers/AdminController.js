@@ -68,7 +68,7 @@ class AdminController {
     const where = {};
 
     if (filters) {
-      const { status, fromPrice, toPrice } = JSON.parse(filters); 
+      // const { status, fromPrice, toPrice } = JSON.parse(filters); 
 
       // if (status) {
       //   where.status = status;
@@ -93,18 +93,8 @@ class AdminController {
       include: [
         {
           model: UserAddress,
-          required: false,
-          where: { UserId: sequelize.col('User.id') }, 
         },
-        {
-          model: Order,
-          attributes: [],
-          required: false,
-          include: [],
-          duplicating: false,
-        }
       ],
-      group: ['User.id'],
     });
     
 

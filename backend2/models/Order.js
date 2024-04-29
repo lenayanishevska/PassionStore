@@ -35,7 +35,7 @@ module.exports = (sequelize, Sequelize) => {
 
   Order.associate = (models) => {
     Order.belongsTo(models.User);
-    Order.hasMany(models.OrderProduct);
+    Order.hasMany(models.OrderProduct,  { onDelete: 'CASCADE' });
     Order.hasOne(models.Income);
   };
 
