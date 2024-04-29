@@ -1,60 +1,180 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
+import { UploadOutlined } from '@ant-design/icons';
+import { Button, message, Upload, Input, Select, InputNumber, } from 'antd';
 import "./AddProduct.css"
-import { InboxOutlined } from '@ant-design/icons';
-import { message, Upload } from 'antd';
-const { Dragger } = Upload;
-const props = {
-  name: 'file',
-  multiple: true,
-  action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-  onChange(info) {
-    const { status } = info.file;
-    if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-    },
-    onDrop(e) {
-        console.log('Dropped files', e.dataTransfer.files);
-    },
-};
+import { ParentCategory } from './ParentCategory';
+import { Category } from './Category';
+import { Manufacturer } from './Manufacturer';
+import { useGetSizesQuery } from '../../redux/Api/CategoriesApi';
+import { Attribute } from './Attribute';
+import axios from "axios";
 
+const { TextArea } = Input;
+const { Option } = Select;
 
 export const AddProduct = () => {
+    const [file, setFile] = useState(null);
+    const [productName, setProductName] = useState('');
+    const [productDescription, setProductDescription] = useState('');
+    const [sku, setSku] = useState('');
+    const [price, setPrice] = useState(0);
+    const [parentCategory, setParentCategory] = useState('');
+    const [category, setCategory] = useState('');
+    const [size, setSize] = useState('');
+    const [quantity, setQuantity] = useState(0);
+    const [manufacturer, setManufacturer] = useState('');
+    const [productSizes, setProductSizes] = useState([]);
+    const [productAttributes, setProductAttributes] = useState([]);
+    const [uploading, setUploading] = useState(false);
+
+    console.log(sku, price );
+
+    const {data} = useGetSizesQuery({});
+    const sizes = data ? data.data : [];
+
+    const selectBefore = (
+        <Select
+          onChange = {(value) => {setSize(value)}}
+          placeholder='size'
+          style={{
+            width: 100,
+          }}
+        >
+            {sizes.map(size => (
+                <Option key={size.id} value={size.id}>{size.name}</Option>
+            ))}
+        </Select>
+    );
+
+    const handleAddSize = (event) => {
+        if(quantity !== 0 && quantity !== null || size !== '')
+        {
+            const newSize = { size: size, quantity: quantity };
+            setProductSizes(prevSizes => [...prevSizes, newSize]);
+        }
+    };
+
+    const handleUpload = () => {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('productName', productName);
+        formData.append('productDescription', productDescription);
+        formData.append('sku', sku);
+        formData.append('price', parseFloat(price));
+        formData.append('category', category);
+        formData.append('manufacturer', manufacturer);
+        formData.append('productSizes', JSON.stringify(productSizes));
+        formData.append('productAttributes', JSON.stringify(productAttributes));
+
+        axios.post('http://localhost:5001/api/shop/products/createProduct', formData)
+            .then((response) => {
+                console.log(response.data);
+                setFile(null);
+                setProductName('');
+                setProductDescription('');
+                setSku('');
+                setPrice(0);
+                setParentCategory('');
+                setCategory('');
+                setManufacturer('');
+                setProductSizes([]);
+                setProductAttributes([]);
+                message.success('Upload successfully.');
+            })
+            .catch((error) => {
+                console.error('Error while uploading:', error);
+                message.error('Upload failed.');
+            })
+            .finally(() => {
+                setUploading(false);
+            });
+    };
+
   return (
     <div className='add-product flex-column'>
-        <span className='add-product-header'>ADD PRODUCT</span>
-        <div className="add-product-container flex-row">
-            <div className="main-product-info flex-column">
-                <span>Main Info</span>
-                <div className="file-upload">
-                    <Dragger {...props}>
-                        <p className="ant-upload-drag-icon">
-                            <InboxOutlined />
-                        </p>
-                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                        <p className="ant-upload-hint">
-                        Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-                        banned files.
-                        </p>
-                    </Dragger>  
-                </div>
-
+      <span className='add-product-header'>ADD PRODUCT</span>
+      <div className="add-product-container flex-row">
+        <div className="main-product-info flex-column">
+          <span className='main-info-header'>Main Info</span>
+          <div className="add-product-info flex-column">
+            <span className='add-product-info-header'>Product Name:</span>
+            <Input placeholder="Product Name" 
+                allowClear 
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+            />
+          </div>
+          <div className="add-product-info flex-column">
+            <span className='add-product-info-header'>Product Description:</span>
+            <TextArea rows={4} placeholder='Description' 
+                allowClear
+                value={productDescription}
+                onChange={(e) => setProductDescription(e.target.value)}
+            />
+          </div>
+          <div className="add-price-SKU flex-row">
+            <div className="add-product-input flex-column">
+                <span className='add-product-info-header'>Product Price:</span>
+                <InputNumber addonAfter="$" defaultValue={1} onChange={(value) => setPrice(value)} />
             </div>
-            <div className="additional-product-info flex-column">
-                <div className="add-product-sizes">
-
-                </div>
-                <div className="add-product-attributes">
-
-                </div>
-                <button>Add Product</button>
+            
+            <div className="add-product-input flex-column">
+                <span className='add-product-info-header'>Product SKU:</span>
+                <Input placeholder="Product SKU" 
+                allowClear 
+                onChange={(e) => setSku(e.target.value)}
+                />
             </div>
+          </div>
+          <div className="add-categories-brand flex-row">
+            <ParentCategory setParentCategory={setParentCategory}></ParentCategory>
+            <Category parentCategory={parentCategory} setCategory={setCategory}></Category>
+            <Manufacturer setManufacturer={setManufacturer}></Manufacturer>
+
+          </div>
+
+          <div className="file-upload flex-column">
+            <span className='add-product-info-header'>Add product image:</span>
+            <Upload
+              beforeUpload={(file) => {
+                setFile(file);
+                return false;
+              }}
+              onRemove={(file) => {
+                setFile(null);
+                return false;
+              }}
+              fileList={file ? [file] : []}
+            >
+              <Button icon={<UploadOutlined />} 
+                style={{
+                    width: 200,
+                    color: '#716D69',
+                }}
+              >Select File</Button>
+            </Upload>
+
+          </div>
         </div>
+        <div className="additional-product-info flex-column">
+            <div className="add-product-sizes flex-column">
+                <span className='main-info-header'>Sizes</span>
+                <InputNumber addonBefore={selectBefore}  defaultValue={0} min={0} onChange={(value) => setQuantity(value)} />
+                <button onClick={handleAddSize}></button>
+            </div>
+            <Attribute setProductAttributes={setProductAttributes} ></Attribute>
+            <Button
+                type="primary"
+                onClick={handleUpload}
+                disabled={!file || !productName || !productDescription}
+                loading={uploading}
+                style={{ marginTop: 10 }}
+            >
+                {uploading ? 'Uploading' : 'Start Upload'}
+            </Button>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};

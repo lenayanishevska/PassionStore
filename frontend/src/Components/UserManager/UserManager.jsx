@@ -2,47 +2,33 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ReactPaginate from 'react-paginate';
 import "react-paginate/theme/basic/react-paginate.css";
-import moment from 'moment'; 
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import Slider from '@mui/material/Slider';
-import Box from '@mui/material/Box';
+import {  Input, Select} from 'antd';
+const { Option } = Select;
 
 
 export const UserManager = () => {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(0);
   const [list, setList] = useState([]);
-  const [sortField, setSortField] = useState('date');
+  const [sortField, setSortField] = useState('last_name');
   const [sortOrder, setSortOrder] = useState('DESC');
-  const [status, setStatus] = useState('');
   const [filterParams, setFilterParams] = useState({});
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [value, setValue] = useState([1, 100]);
+  const [searchEmail, setSearchEmail] = useState('');
 
   const sort = {
     sortField: sortField,
     sortOrder: sortOrder,
   }
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-    setFilterParams(prevParams => ({
-      ...prevParams,
-      fromPrice: parseFloat(value[0]),
-      toPrice: parseFloat(value[1]),
-    }));
-  };
 
   const reload = () => {
     setIsLoading(true);
     axios
-      .get(`http://localhost:5001/api/admin/orders?page=${page}&itemPerPage=10&sort=${JSON.stringify(sort)}&filters=${JSON.stringify(filterParams)}`)
+      .get(`http://localhost:5001/api/admin/users?page=${page}&itemPerPage=10&sort=${JSON.stringify(sort)}`)
       .then((response) => {
+        console.log(response.data.data)
         setIsError(false);
         setIsLoading(false);
         setList(response.data.data.list);
@@ -61,115 +47,63 @@ export const UserManager = () => {
 
   useEffect(() => {
     reload();
-  }, [sortField, sortOrder, value, status]);
+  }, [sortField, sortOrder]);
 
   useEffect(() => {
     reload();
   }, [page]);
 
-  const completeOrder = (orderId) => {
-    console.log("OrderId", orderId);
-    axios({
-      method: "POST",
-      url: "http://localhost:5001/api/admin/updateOrder",
-      data: { id: orderId, status: "Completed" },
-    }).then((data) => {
-      reload();
-    }).catch((error) => {
-      alert(error);
-    });
-  };
 
   const changePage = ({selected}) => {
     setPage(selected);
   }
 
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
-    setFilterParams(prevParams => ({
-      ...prevParams,
-      status: ! event.target.value !== '' ? event.target.value : null
-    }));
-  };
-
-  const handleReset = () => {
-    setFilterParams({});
-    setStatus("");
-    setValue([1, 100]);
-  };
-
   return (
     <div className="orders flex-column">
       <div className="orders-header">
-        <h2>ORDERS</h2>
+        <h2>Users</h2>
       </div>
 
       <div className="order-filters-sorts flex-row">
-        <div className="status-filter flex-row">
-          <FormControl sx={{ mb: 1}} >
-            <FormLabel id="demo-row-radio-buttons-group-label" sx={{ '&.Mui-focused': { color: '#AC5656' } }}>Status</FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="demo-row-radio-buttons-group-label"
-              name="row-radio-buttons-group"
-              value={status} // Встановлюємо значення статусу
-              onChange={handleStatusChange} // Обробник для зміни значення статусу
-            >
-              <FormControlLabel value="" control={<Radio size="small" sx={{ '&.Mui-checked': { color: '#AC5656' }}}/>} label="All" sx={{ fontSize: 'small' }}/>
-              <FormControlLabel value="Processing" control={<Radio size="small" sx={{ '&.Mui-checked': { color: '#AC5656' }}}/>} label="Processing" sx={{ fontSize: 'small' }}/>
-              <FormControlLabel value="Completed" control={<Radio size="small" sx={{ '&.Mui-checked': { color: '#AC5656' }}}/>} label="Completed" sx={{ fontSize: 'small' }}/>
-
-            </RadioGroup>
-          </FormControl>
-
-          <div className="orders-price flex-column">
-            <span>Prices</span>
-            <Box sx={{ width: 200}}>
-              <Slider
-                getAriaLabel={() => 'Price range'}
-                value={value}
-                size="small"
-                onChange={handleChange}
-                valueLabelDisplay="auto"
-                min={1}
-                max={1000}
-                sx={{
-                  '& .MuiSlider-thumb': {
-                      color: '#AC5656', 
-                      '&:hover, &.Mui-focusVisible': {
-                        boxShadow: '0px 0px 0px 8px rgba(172, 86, 86, 0.16)', 
-                    },
-                  },
-                  '& .MuiSlider-track': {
-                      color: '#AC5656', 
-                  },
-                  '& .MuiSlider-rail': {
-                      color: '#ccc', 
-                  },
-                  '& .MuiSlider-valueLabel': {
-                    color: '#AC5656',
-                    backgroundColor: '#B8B2AA',
-                  },
-              }}
-              />
-              </Box>
-          </div>
-
-
-          <button onClick={handleReset}>Reset</button>
+      <div className="order-search">
+            {/* <Input.Search
+                placeholder="Search"
+                onSearch={handleSearch}
+                enterButton
+            /> */}
         </div>
         <div className="order-sort flex-row">
-              <select onChange={(e) => {
-                const [option, order] = e.target.value.split(' ');
-                setSortField(option);
-                setSortOrder(order);
-              }}>
-                <option value="date DESC">Sort by</option>
-                <option value="total_amount ASC">price (asc)</option>
-                <option value="total_amount DESC">price (desc)</option>
-                <option value="date ASC">date (asc)</option>
-                <option value="date DESC">date (desc)</option>
-              </select>
+                
+                <Select
+                    onChange={(value) => {
+                        const [option, order] = value.split(' ');
+                        setSortField(option);
+                        setSortOrder(order);
+                    }}
+                    placeholder='Sort By'
+                    style={{
+                        width: 150,
+                    }}
+                    options={[
+                        {
+                        value: 'last_name ASC',
+                        label: 'Last name (asc)',
+                        },
+                        {
+                        value: 'last_name DESC',
+                        label: 'Last name (desc)',
+                        },
+                        {
+                        value: 'email ASC',
+                        label: 'Email (asc)',
+                        },
+                        {
+                        value: 'email DESC',
+                        label: 'Email (desc)',
+                        },
+                    ]}
+                    
+                />
         </div>
       </div>
 
@@ -178,30 +112,22 @@ export const UserManager = () => {
           <thead>
             <tr>
               <th>#</th>
-              <th>Date</th>
-              <th>Total amount</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>Fullname</th>
+              <th>Email</th>
+              <th>Address</th>
+              <th>City</th>
+              <th>Country</th>
             </tr>
           </thead>
           <tbody>
             {list.map((item) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
-                <td>{moment(item.date).format('YYYY-MM-DD HH:mm:ss')}</td>
-                <td>$ {item.total_amount}</td>
-                <td>{item.status}</td>
-                <td>
-                  {item.status === "Processing" ? (
-                    <button className="complete-order-button"
-                      onClick={() => {
-                        completeOrder(item.id);
-                      }}
-                    >
-                      COMPLETE
-                    </button>
-                  ) : null}
-                </td>
+                <td>{item.first_name} {item.last_name}</td>
+                <td>{item.email}</td>
+                <td>{item.UserAddress ? item.UserAddress.address : "No address"}</td>
+                <td>{item.UserAddress ? item.UserAddress.city: "No address"}</td>
+                <td>{item.UserAddress ? item.UserAddress.country: "No address"}</td>
               </tr>
             ))}
           </tbody>

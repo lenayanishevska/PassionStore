@@ -49,7 +49,7 @@ export const Dashboard = () => {
             </div>
             <div className="stat flex-column">
                 <h3>Month Income</h3>
-                <span className='orders-count'>{income}</span>
+                <span className='orders-count'>{income ? income.toFixed(2): 0}</span>
                 <span className='month'>{statistic.currentMonth}, {statistic.currentYear}</span>
             </div>
             <div className="stat flex-column">

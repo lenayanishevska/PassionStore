@@ -9,14 +9,11 @@ const {
   OrderProduct,
   Order,
   Attribute,
-  Option,
-  OptionValue,
   Category,
   Manufacturer,
   ProductAttribute,
-  ProductOption,
   Size,
-  ProductSize
+  ProductSize,
 } = require("../models");
 
 class ProductController {
@@ -49,7 +46,6 @@ class ProductController {
         where.CategoryId = CategoryId; // Додаємо умову для категорії одягу
       }
       if (manufacturer) {
-        // Отримуємо ідентифікатор виробника за його іменем з іншої таблички Manufacturer
         const manufacturerInstance = await Manufacturer.findOne({
           where: { name: manufacturer },
         });
@@ -86,6 +82,7 @@ class ProductController {
 
     const { name, description, price, SKU, CategoryId, ManufacturerId } =
       await bodySchema.validateAsync(req.body);
+
     const { image_url } = req.files;
     let fileName = uuid.v4() + ".jpg";
     image_url.mv(path.resolve(__dirname, "..", "static", fileName));
@@ -100,6 +97,35 @@ class ProductController {
       ManufacturerId,
     });
 
+    return product;
+  }
+
+  async createProduct(req, res, next) {
+    console.log("Body: ", req.body);
+
+    const { productName, productDescription, price, sku, category, manufacturer, productSizes, productAttributes} = req.body;
+
+    console.log(productName, productDescription, price);
+    
+    const { file } = req.files;
+    const fileName = `${uuid.v4()}.jpg`;
+
+    // Перемістіть зображення у папку "static"
+    file.mv(path.resolve(__dirname, '..', 'static', fileName));
+
+    console.log("File Name: ", fileName);
+
+    const product = await Product.create({
+      name: productName,
+      description: productDescription,
+      price,
+      SKU: sku,
+      image_url: fileName,
+      CategoryId: category,
+      ManufacturerId: manufacturer,
+      quantity: 0
+    });
+    
     return product;
   }
 
@@ -274,8 +300,6 @@ class ProductController {
 
     const currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
 
-    console.log("Total Amount: ", totalAmount, "Date: ", currentDate);
-
     const order = await Order.create({
       total_amount: totalAmount,
       status: "Processing",
@@ -347,6 +371,22 @@ class ProductController {
 
     return productSize;
   }
+
+  async manufacturerlist(req, res, next) {
+    const list = await Manufacturer.findAll();
+    return list;
+  }
+
+  async sizelist(req, res, next) {
+    const list = await Size.findAll();
+    return list;
+  }
+
+  async attributelist(req, res, next) {
+    const list = await Attribute.findAll();
+    return list;
+  }
 }
+
 
 module.exports = new ProductController();

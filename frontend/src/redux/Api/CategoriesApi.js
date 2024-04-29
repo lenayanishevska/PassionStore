@@ -7,6 +7,15 @@ export const categoriesApi = createApi({
         getCategories: build.query({
             query: (parentId = '') => `shop/categories/list?${parentId && `parentCategoryId=${parentId}`}`,
         }),
+        getManufacturers: build.query({
+            query: () => `shop/products/manufacturerList`,
+        }),
+        getSizes: build.query({
+            query: () => `shop/products/sizeList`,
+        }),
+        getAttributes: build.query({
+            query: () => `shop/products/attributeList`,
+        }),
     })
 });
-export const {useGetCategoriesQuery} = categoriesApi;
+export const {useGetCategoriesQuery, useGetManufacturersQuery, useGetSizesQuery, useGetAttributesQuery} = categoriesApi;

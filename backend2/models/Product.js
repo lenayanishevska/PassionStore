@@ -50,10 +50,6 @@ module.exports = (sequelize, Sequelize) => {
     Product.belongsTo(models.Category);
     Product.belongsTo(models.Manufacturer);
     Product.hasOne(models.OrderProduct);
-    // Product.belongsToMany(models.Size, { through: models.ProductSize });
-    Product.belongsToMany(models.Attribute, {
-      through: models.ProductAttribute,
-    });
   };
 
   return Product;
