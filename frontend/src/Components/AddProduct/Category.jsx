@@ -3,7 +3,7 @@ import {  Select, } from 'antd';
 import './AddProduct.css'
 import { useGetCategoriesQuery } from '../../redux/Api/CategoriesApi';
 
-export const Category = ({parentCategory, setCategory}) => {
+export const Category = ({parentCategory, setCategory, category}) => {
     const parentId = parentCategory ? parentCategory : 2
     const {data} = useGetCategoriesQuery(parentId);
     const subcategories = data ? data.data : [];

@@ -4,6 +4,8 @@ import './Dashboard.css';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useGetMonthInfoQuery } from '../../redux/Api/AdminApi';
 import { ExpensesForm } from './ExpensesForm';
+import { DownloadOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 
 export const Dashboard = () => {
   const [chartData, setChartData] = useState({names: ["MON 1", "Mon 2"], values: [1, 2], expenses: [1, 2]});
@@ -29,9 +31,9 @@ export const Dashboard = () => {
     reload();
   }, []);
 
-  useEffect(() => {
-    reload();
-  }, [chartData]);
+  // useEffect(() => {
+  //   reload();
+  // });
 
   return (
     <div className='dashboard flex-column'>
@@ -72,6 +74,7 @@ export const Dashboard = () => {
                 />
             </div>
             <ExpensesForm></ExpensesForm>
+
         </div>
     </div>
   )

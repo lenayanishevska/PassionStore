@@ -3,12 +3,11 @@ import { useGetAttributesQuery } from '../../redux/Api/CategoriesApi';
 import {  Select, Input} from 'antd';
 import './AddProduct.css'
 
-export const Attribute = ({setProductAttributes, }) => {
+export const Attribute = ({setProductAttributes}) => {
     const [attribute, setAttribute] = useState('');
     const [value, setValue] = useState('');
     const {data} = useGetAttributesQuery();
     const attributes = data ? data.data : [];
-    console.log(attribute, value);
 
     const handleAddAttribute = (event) => {
         if(value !== '' && value !== null || attribute !== '')
@@ -31,8 +30,8 @@ export const Attribute = ({setProductAttributes, }) => {
                 label: attributes.name,
             }))}
         />
-        <Input placeholder="Option" allowClear onChange={(e) => { setValue(e.target.value) }}/>
-        <button onClick={handleAddAttribute}></button>
+        <Input placeholder="Option" allowClear value={value} onChange={(e) => { setValue(e.target.value) }}/>
+        <button className='add-sizes-button' onClick={handleAddAttribute}>Add</button>
     </div>
   )
 }

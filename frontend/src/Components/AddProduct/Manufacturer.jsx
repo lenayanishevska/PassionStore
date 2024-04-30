@@ -3,7 +3,7 @@ import './AddProduct.css'
 import { useGetManufacturersQuery } from '../../redux/Api/CategoriesApi';
 import {  Select } from 'antd';
 
-export const Manufacturer = ({setManufacturer}) => {
+export const Manufacturer = ({setManufacturer, manufacturer}) => {
     const {data} = useGetManufacturersQuery();
     const manufacturers = data ? data.data : [];
   return (

@@ -10,6 +10,7 @@ export const Cart = () => {
   const user = useSelector(state => state.userLogin.userInfo);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [list, SetList] = useState([]);
 
   const [createOrder] = useCreateOrderMutation();
 
@@ -30,7 +31,7 @@ export const Cart = () => {
 
   useEffect(() => {
     refetch();
-  }, [userId, refetch]);
+  }, [cartProducts]);
 
   const total = cartProducts.reduce((accumulator, item) => {
     return accumulator + item.amount;

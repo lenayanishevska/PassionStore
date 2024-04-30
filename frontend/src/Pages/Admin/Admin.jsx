@@ -10,6 +10,7 @@ import { Dashboard } from '../../Components/Dashboard/Dashboard';
 import { OrderManager } from '../../Components/OrderManager/OrderManager';
 import { UserManager } from '../../Components/UserManager/UserManager';
 import { AddProduct } from '../../Components/AddProduct/AddProduct';
+import { AddOptions } from '../../Components/AddOptions/AddOptions';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -40,6 +41,11 @@ function TabPanel(props) {
       {value === 3 && (
         <div className="orders-panel">
           <AddProduct/>
+        </div>
+      )}
+      {value === 4 && (
+        <div className="orders-panel">
+          <AddOptions></AddOptions>
         </div>
       )}
     </div>
@@ -120,6 +126,7 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
         <StyledTab label="Users" {...a11yProps(1)} />
         <StyledTab label="Orders" {...a11yProps(2)} />
         <StyledTab label="Add product" {...a11yProps(3)} />
+        <StyledTab label="Add options" {...a11yProps(4)} />
       </StyledTabs>
       <TabPanel value={value} index={0}>
       </TabPanel>
@@ -128,6 +135,8 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
       <TabPanel value={value} index={2}>
       </TabPanel>
       <TabPanel value={value} index={3}>
+      </TabPanel>
+      <TabPanel value={value} index={4}>
       </TabPanel>
     </Box>
   );
