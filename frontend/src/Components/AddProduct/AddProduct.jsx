@@ -116,21 +116,22 @@ export const AddProduct = () => {
           <div className="add-price-SKU flex-row">
             <div className="add-product-input flex-column">
                 <span className='add-product-info-header'>Product Price:</span>
-                <InputNumber addonAfter="$" defaultValue={1} onChange={(value) => setPrice(value)} />
+                <InputNumber addonAfter="$" defaultValue={1} value={price} onChange={(value) => setPrice(value)} />
             </div>
             
             <div className="add-product-input flex-column">
                 <span className='add-product-info-header'>Product SKU:</span>
                 <Input placeholder="Product SKU" 
                 allowClear 
+                value={sku}
                 onChange={(e) => setSku(e.target.value)}
                 />
             </div>
           </div>
           <div className="add-categories-brand flex-row">
-            <ParentCategory setParentCategory={setParentCategory}></ParentCategory>
-            <Category parentCategory={parentCategory} setCategory={setCategory}></Category>
-            <Manufacturer setManufacturer={setManufacturer}></Manufacturer>
+            <ParentCategory parentCategory={parentCategory} setParentCategory={setParentCategory}></ParentCategory>
+            <Category parentCategory={parentCategory} setCategory={setCategory} category={category}></Category>
+            <Manufacturer setManufacturer={setManufacturer} manufacturer={manufacturer}></Manufacturer>
 
           </div>
 
@@ -160,16 +161,17 @@ export const AddProduct = () => {
         <div className="additional-product-info flex-column">
             <div className="add-product-sizes flex-column">
                 <span className='main-info-header'>Sizes</span>
-                <InputNumber addonBefore={selectBefore}  defaultValue={0} min={0} onChange={(value) => setQuantity(value)} />
-                <button onClick={handleAddSize}></button>
+                <InputNumber addonBefore={selectBefore}  defaultValue={0} min={0} value={quantity} onChange={(value) => setQuantity(value)} />
+                <button className='add-sizes-button' onClick={handleAddSize}>Add</button>
             </div>
             <Attribute setProductAttributes={setProductAttributes} ></Attribute>
             <Button
                 type="primary"
                 onClick={handleUpload}
-                disabled={!file || !productName || !productDescription}
+                disabled={!file || !productName || !productDescription || !sku || !price || !category || !parentCategory || !manufacturer}
                 loading={uploading}
                 style={{ marginTop: 10 }}
+                className='add-sizes-button'
             >
                 {uploading ? 'Uploading' : 'Start Upload'}
             </Button>

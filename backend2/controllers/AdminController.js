@@ -2,7 +2,7 @@ const { Op } = require("sequelize");
 const moment = require("moment");
 const { Order, OrderProduct, User, UserAddress, Income, Expense } = require("../models");
 const Joi = require('joi');
-const sequelize = require('sequelize');
+const { sequelize } = require("../models");
 
 class AdminController {
   async orders(req, res, next) {
@@ -212,6 +212,36 @@ class AdminController {
       currentYear,
     };
   }
+
+  async getOrdersWithUsers(req, res, next) {
+    const query = "SELECT get_orders_with_users_and_addresses() AS orders_with_users_info";
+    const result = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+    const exportFile = result[0].orders_with_users_info;
+    return exportFile;
+  }
+
+  async exportOrdersWithUsers(req, res, next) {
+    try {
+        // Виконання запиту SQL
+        const query = "SELECT * FROM export_product_category_manufacturer()";
+        const result = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        
+        // Перетворення кожного об'єкта у рядок CSV
+        const csvRows = result.map(row => Object.values(row).join(','));
+
+        // Створення рядка CSV з рядками
+        const csvData = csvRows.join('\n');
+
+        res.set({
+            'Content-Type': 'text/csv',
+            'Content-Disposition': 'attachment; filename=orders_with_users.csv'
+        });
+        res.send(csvData);
+    } catch (error) {
+        console.error('Error while exporting:', error);
+        res.status(500).json({ success: false, message: 'Error while exporting' });
+    }
+}
 }
 
 module.exports = new AdminController();

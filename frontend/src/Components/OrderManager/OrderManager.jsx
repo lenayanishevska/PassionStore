@@ -11,6 +11,9 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
+import { DownloadOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import { saveAs } from 'file-saver';
 
 
 export const OrderManager = () => {
@@ -38,6 +41,23 @@ export const OrderManager = () => {
       toPrice: parseFloat(value[1]),
     }));
   };
+
+  const handleExport = () => {
+    axios
+      .get(`http://localhost:5001/api/admin/export`)
+      .then((response) => {
+        const exportData = response.data.data;
+        const jsonData = JSON.stringify(exportData , null, 2);
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        saveAs(blob, 'orders_with_users.json');
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsError(true);
+        setIsLoading(false);
+      });
+  };
+
 
   const reload = () => {
     setIsLoading(true);
@@ -69,7 +89,6 @@ export const OrderManager = () => {
   }, [page]);
 
   const completeOrder = (orderId) => {
-    console.log("OrderId", orderId);
     axios({
       method: "POST",
       url: "http://localhost:5001/api/admin/updateOrder",
@@ -158,6 +177,9 @@ export const OrderManager = () => {
 
 
           <button onClick={handleReset}>Reset</button>
+
+          <Button type="primary" shape="round" icon={<DownloadOutlined />} onClick={handleExport} />
+          
         </div>
         <div className="order-sort flex-row">
               <select onChange={(e) => {

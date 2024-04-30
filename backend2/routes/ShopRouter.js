@@ -31,8 +31,9 @@ router.get("/pages/list", authMiddleware, wrapAsync(pageController.list));
 router.get("/pages/item", wrapAsync(pageController.item));
 router.post("/pages/create", authMiddleware, wrapAsync(pageController.create));
 
-router.post("/attributes/create", authMiddleware, wrapAsync(productController.createAttribute));
-router.post("/sizes/create", authMiddleware, wrapAsync(productController.createSize));
+router.post("/attributes/create", wrapAsync(productController.createAttribute));
+router.post("/sizes/create", wrapAsync(productController.createSize));
+router.post("/manufacturers/create", wrapAsync(productController.createManufacturer));
 router.post("/sizes/createProductSize", authMiddleware, wrapAsync(productController.createProductSize));
 
 

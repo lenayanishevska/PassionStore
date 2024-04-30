@@ -18,13 +18,16 @@ const {
 
 class ProductController {
   async list(req, res, next) {
+    console.log("Query.......................",req.query);
     const querySchema = Joi.object({
       parentCategoryId: Joi.number(),
       sort: Joi.string().optional(),
       filter: Joi.string().optional(),
+      itemPerPage: Joi.number().default(10),
+      page: Joi.number().default(0),
     });
 
-    const { parentCategoryId, sort, filter } = await querySchema.validateAsync(
+    const { parentCategoryId, sort, filter,itemPerPage, page } = await querySchema.validateAsync(
       req.query
     );
 
@@ -40,21 +43,16 @@ class ProductController {
 
     if (filter) {
       const { CategoryId, manufacturer, fromPrice, toPrice } =
-        JSON.parse(filter); // Витягуємо параметри фільтру з об'єкта filter
+        JSON.parse(filter);
 
       if (CategoryId) {
-        where.CategoryId = CategoryId; // Додаємо умову для категорії одягу
+        where.CategoryId = CategoryId; 
       }
       if (manufacturer) {
-        const manufacturerInstance = await Manufacturer.findOne({
-          where: { name: manufacturer },
-        });
-        if (manufacturerInstance) {
-          where.ManufacturerId = manufacturerInstance.id; // Додаємо умову для ідентифікатора виробника
-        }
+        where.ManufacturerId = manufacturer;
       }
       if (fromPrice && toPrice) {
-        where.price = { [Op.between]: [fromPrice, toPrice] }; // Додаємо умову для ціни в межах від fromPrice до toPrice
+        where.price = { [Op.between]: [fromPrice, toPrice] };
       }
     }
 
@@ -65,9 +63,18 @@ class ProductController {
       order = [[sortField, sortOrder]];
     }
 
-    const list = await Product.findAll({ where, order });
+    const list = await Product.findAll({ where, order, limit: itemPerPage, offset: page * itemPerPage, });
 
-    return list;
+    const totalCount = await Product.count({ where });
+
+    const pageCount = Math.ceil(totalCount/ itemPerPage);
+
+    return {
+      list,
+      totalCount,
+      itemPerPage,
+      pageCount,
+    };
   }
 
   async create(req, res, next) {
@@ -101,7 +108,6 @@ class ProductController {
   }
 
   async createProduct(req, res, next) {
-    console.log("Body: ", req.body);
 
     const { productName, productDescription, price, sku, category, manufacturer, productSizes, productAttributes} = req.body;
 
@@ -109,11 +115,7 @@ class ProductController {
     
     const { file } = req.files;
     const fileName = `${uuid.v4()}.jpg`;
-
-    // Перемістіть зображення у папку "static"
     file.mv(path.resolve(__dirname, '..', 'static', fileName));
-
-    console.log("File Name: ", fileName);
 
     const product = await Product.create({
       name: productName,
@@ -125,7 +127,39 @@ class ProductController {
       ManufacturerId: manufacturer,
       quantity: 0
     });
-    
+
+    console.log(productSizes);
+    console.log(productAttributes);
+
+    if(productSizes) {
+      const sizes = JSON.parse(productSizes);
+
+      for (const size of sizes) {
+        console.log(size.size);
+        console.log(size.quantity);
+        console.log(product.id);
+        await ProductSize.create({
+          sizeId: size.size,
+          quantity: size.quantity,
+          productId: product.id
+        });
+      }
+    }
+
+    if(productAttributes) {
+      const attributes = JSON.parse(productAttributes);
+
+      for (const attribute of attributes) {
+        console.log(attribute.attribute);
+        console.log(attribute.value);
+        await ProductAttribute.create({
+          attributeId: attribute.attribute,
+          value: attribute.value,
+          productId: product.id
+        });
+      }
+    }
+
     return product;
   }
 
@@ -354,6 +388,20 @@ class ProductController {
     return size;
   }
 
+  async createManufacturer(req, res, next) {
+    const bodySchema = Joi.object({
+      name: Joi.string().required(),
+    });
+
+    const { name } = await bodySchema.validateAsync(req.body);
+
+    const manufacturer = await Manufacturer.create({
+      name,
+    });
+
+    return manufacturer;
+  }
+
   async createProductSize(req, res, next) {
     const bodySchema = Joi.object({
       productId: Joi.number().required(),
@@ -364,8 +412,8 @@ class ProductController {
     const { productId, sizeId, quantity } = await bodySchema.validateAsync(req.body);
 
     const productSize = await ProductSize.create({
-      ProductId: productId,
-      SizeId: sizeId,
+      productId: productId,
+      sizeId: sizeId,
       quantity: quantity
     });
 

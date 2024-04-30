@@ -10,5 +10,7 @@ router.get("/saleChart"/*, authMiddleware*/, wrapAsync(adminController.saleChart
 router.get("/orders"/*, authMiddleware*/, wrapAsync(adminController.orders));
 router.get("/users"/*, authMiddleware*/, wrapAsync(adminController.users));
 router.post("/updateOrder"/*, authMiddleware*/, wrapAsync(adminController.updateOrder));
+router.get("/export"/*, authMiddleware*/, wrapAsync(adminController.getOrdersWithUsers));
+router.get("/exportCSV"/*, authMiddleware*/, adminController.exportOrdersWithUsers);
 
 module.exports = router;

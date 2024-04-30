@@ -3,7 +3,7 @@ import './GenderCategory.css'
 import CategoriesSlider from '../../Components/CategoriesSlider/CategoriesSlider'
 import { useParams } from "react-router-dom";
 import Products from '../../Components/Products/Products';
-import { useGetCategoriesQuery } from '../../redux/Api/CategoriesApi';
+import { useGetCategoriesQuery, useGetManufacturersQuery } from '../../redux/Api/CategoriesApi';
 
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -11,6 +11,8 @@ import Checkbox from '@mui/material/Checkbox';
 import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
 import { brown, grey } from '@mui/material/colors';
+import ReactPaginate from 'react-paginate';
+import "react-paginate/theme/basic/react-paginate.css";
 
 export const GenderCategory = () => {
   const [sortField, setSortField] = useState('name');
@@ -19,6 +21,8 @@ export const GenderCategory = () => {
   const [filterParams, setFilterParams] = useState({});
   const {category} = useParams();
   const [value, setValue] = useState([1, 100]);
+  const [pageCount, setPageCount] = useState(0);
+  const [page, setPage] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -35,9 +39,16 @@ export const GenderCategory = () => {
     setValue([1, 100]);
   };
 
+  const changePage = ({selected}) => {
+    setPage(selected);
+  }
+
 
   const {data} = useGetCategoriesQuery(category);
   const subcategories = data ? data.data : [];
+
+  const {data: manufacturerList} = useGetManufacturersQuery();
+  const manufacturers = manufacturerList ? manufacturerList.data : [];
 
   const sortParams = {
     sortField: sortField,
@@ -51,7 +62,6 @@ export const GenderCategory = () => {
   };
 
   const header = category === '1'? 'Men\'s': 'Women\'s';
-  const brands = [{name: 'Zara'}, {name:'H&M'}, {name:'Mango'}, {name:'Bershka'}, {name:'Reserved'}];
 
   return (
     <div className='catalog-page'>
@@ -61,7 +71,7 @@ export const GenderCategory = () => {
           <div className="filters flex-column">
             <h3>Brands</h3>
             <FormGroup>
-              {brands.map((item, index) => {
+              {manufacturers.map((item, index) => {
                 return (
                   <FormControlLabel key={index} sx={{ color: grey[800] }} control={<Checkbox sx={{
                     color: brown[600],
@@ -69,12 +79,12 @@ export const GenderCategory = () => {
                       color: brown[400],
                     },
                   }}/>} 
-                  checked={manufacturer === item.name} 
+                  checked={manufacturer === item.id} 
                   onChange={(e) => {
-                    setManufacturer(item.name);
+                    setManufacturer(item.id);
                     setFilterParams(prevParams => ({
                       ...prevParams,
-                      manufacturer: !item.name ? null : item.name
+                      manufacturer: !item.id ? null : item.id
                     }));
                   }}
                   label={item.name}/>
@@ -139,7 +149,28 @@ export const GenderCategory = () => {
             </div>
           </div>
           <div className="products-list">
-            <Products params={productParams}/>
+            <Products params={productParams} setPage={setPage} setPageCount={setPageCount} page={page}/>
+            <div className="order-paginator">
+
+              <ReactPaginate
+              breakLabel="..."
+              nextLabel="next >"
+              onPageChange={changePage}
+              pageRangeDisplayed={5}
+              pageCount={pageCount}
+              previousLabel="< previous"
+              renderOnZeroPageCount={null}
+              className="react-paginate"
+              forcePage={page}
+              pageLinkClassName="active" // Додаємо клас для активної сторінки
+              activeLinkClassName="active-link"
+              previousClassName="page"
+              nextClassName="page"
+              containerClassName="pagination"
+              pageClassName="page" // Додаємо клас для кожної сторінки
+              />
+
+            </div>
           </div>
         </div>
       </div>

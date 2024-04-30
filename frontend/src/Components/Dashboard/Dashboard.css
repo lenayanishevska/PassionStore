@@ -118,6 +118,12 @@
     margin: 10px 0px;
 }
 
+.expences-container button:hover {
+    border: 2px solid rgba(53, 52, 52, 0.9);
+    background-color: rgba(53, 52, 52, 0.4);
+    color: var(--light-black-color);
+}
+
 
 
 

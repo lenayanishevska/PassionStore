@@ -31,6 +31,8 @@ export const ProductDetail = () => {
   const { data, error, isLoading } = useGetProductByIdQuery({ productId: productId });
   const product = data ? data.data : '';
 
+  console.log(product);
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -111,7 +113,7 @@ export const ProductDetail = () => {
 
           <div className="options-container flex-column">
 
-            <div className="colors flex-column">
+            {/* <div className="colors flex-column">
 
               <h3>COLOR</h3>
 
@@ -119,7 +121,7 @@ export const ProductDetail = () => {
                 <p>Beige</p>
               </div>
   
-            </div>
+            </div> */}
 
             <div className="sizes flex-column">
 
@@ -168,9 +170,13 @@ export const ProductDetail = () => {
 
         <div className="product-attribes flex-column">
           <Panel ref={refs.material} header="DETAILS" toggleable collapsed={true}>
-              <p className="m-0">
-                {product.attributes ? product.attributes : ''}
-              </p>
+            { product ? product.attributes.map((item, index) => {
+                  return (
+                    <p key={index} className="m-0">
+                      {item.name} : {item.value}
+                    </p>
+                  )
+                }): ''}
           </Panel>
         </div>
 
