@@ -171,10 +171,12 @@ class AdminController {
 }
 
   async monthInfo(req, res, next) {
+    const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
+    const endOfMonth = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
     const orders = await Order.findAll({
       where: {
         date: {
-          [Op.gte]: moment.utc().startOf("month").format("YYYY-MM-DD HH:mm:ss"),
+          [Op.between]: [startOfMonth, endOfMonth],
         },
       },
     });
@@ -185,7 +187,13 @@ class AdminController {
     //   return +order.total_amount + +val;
     // }, 0);
 
-    const totalAmountSum = await Income.sum('amount');
+    const totalAmountSum = await Income.sum('amount', {
+      where: {
+        date: {
+          [Op.between]: [startOfMonth, endOfMonth],
+        },
+      },
+    });
 
 
     const orderIds = orders.map((order) => order.id);

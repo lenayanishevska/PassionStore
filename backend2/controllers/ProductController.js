@@ -18,7 +18,6 @@ const {
 
 class ProductController {
   async list(req, res, next) {
-    console.log("Query.......................",req.query);
     const querySchema = Joi.object({
       parentCategoryId: Joi.number(),
       sort: Joi.string().optional(),
@@ -111,8 +110,6 @@ class ProductController {
 
     const { productName, productDescription, price, sku, category, manufacturer, productSizes, productAttributes} = req.body;
 
-    console.log(productName, productDescription, price);
-    
     const { file } = req.files;
     const fileName = `${uuid.v4()}.jpg`;
     file.mv(path.resolve(__dirname, '..', 'static', fileName));
@@ -127,9 +124,6 @@ class ProductController {
       ManufacturerId: manufacturer,
       quantity: 0
     });
-
-    console.log(productSizes);
-    console.log(productAttributes);
 
     if(productSizes) {
       const sizes = JSON.parse(productSizes);
@@ -202,13 +196,16 @@ class ProductController {
 
     const options = await ProductSize.findAll({
       where: {
-        productId,
+          productId,
+          quantity: {
+              [Op.gt]: 0, // Перевірка, що кількість товару більше 0
+          },
       },
       include: [
-        {
-          model: Size,
-          as: 'size',
-        },
+          {
+              model: Size,
+              as: 'size',
+          },
       ],
     });
 
@@ -226,6 +223,7 @@ class ProductController {
   }
 
   async addToCart(req, res, next) {
+    console.log("Body  ", req.body);
     const bodySchema = Joi.object({
       productId: Joi.number().required(),
       quantity: Joi.number().required(),
@@ -248,19 +246,40 @@ class ProductController {
       throw new Error("Product not found");
     }
 
+    const productSize = await ProductSize.findOne({
+      where: {
+        id: sizeId
+      },
+    });
+
+    console.log("Order Quantity: ", quantity);
+    console.log("Product Quantity: ", productSize.quantity);
+
+    if (!productSize || productSize.quantity < quantity) {
+      console.log("EROOOORRRRRRRRRR");
+      throw new Error("Insufficient quantity of product in selected size");
+    }
+
     const orderProduct = await OrderProduct.findOne({
       where: {
         ProductId: productId,
         UserId: userId,
+        size: sizeId,
         OrderId: null,
       },
     });
 
     if (orderProduct) {
+      const new_quantity = orderProduct.quantity + quantity;
+
+      if (productSize.quantity < new_quantity) {
+        throw new Error("Insufficient quantity of product in selected size");
+      }
+  
       await OrderProduct.update(
         {
-          quantity: orderProduct.quantity + quantity,
-          amount: product.price * (orderProduct.quantity + quantity),
+          quantity: new_quantity,
+          amount: product.price * (new_quantity),
         },
         {
           where: {
@@ -274,6 +293,7 @@ class ProductController {
         UserId: userId,
         amount: product.price * quantity,
         quantity: quantity,
+        size: sizeId,
         OrderId: null,
       });
     }
@@ -327,6 +347,20 @@ class ProductController {
       throw new Error("No products in cart");
     }
 
+    for (let orderProduct of orderProductList) {
+      const { ProductId, size, quantity } = orderProduct;
+
+      const productSize = await ProductSize.findOne({
+          where: {
+              id: size,
+          }
+      });
+
+      if (!productSize || productSize.quantity < quantity) {
+          throw new Error(`Not enough quantity available for product with id ${ProductId}`);
+      }
+    }
+
     let totalAmount = 0;
     for (let index = 0; index < orderProductList.length; index++) {
       totalAmount += orderProductList[index].amount; 
@@ -340,6 +374,24 @@ class ProductController {
       UserId: userId,
       date: currentDate,
     });
+
+    for (let orderProduct of orderProductList) {
+      const { ProductId, size, quantity } = orderProduct;
+
+      // Оновлення кількості у таблиці ProductSize
+      await ProductSize.decrement('quantity', {
+        by: quantity,
+        where: {
+          id: size,
+        }
+      });
+
+      // Отримання і оновлення кількості у таблиці Product
+      const product = await Product.findByPk(ProductId);
+      if (product) {
+        await product.decrement('quantity', { by: quantity });
+      }
+    }
 
     for (let index = 0; index < orderProductList.length; index++) {
       await OrderProduct.update(

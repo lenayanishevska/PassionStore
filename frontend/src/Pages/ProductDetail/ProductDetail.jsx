@@ -8,9 +8,9 @@ import { useSelector} from 'react-redux';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
-import { InputNumber } from 'primereact/inputnumber';
 import { useNavigate } from 'react-router-dom';
 import { useAddProductToCartMutation } from '../../redux/Api/OderApi.js';
+import { message } from 'antd';
 
 export const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
@@ -30,8 +30,6 @@ export const ProductDetail = () => {
 
   const { data, error, isLoading } = useGetProductByIdQuery({ productId: productId });
   const product = data ? data.data : '';
-
-  console.log(product);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -57,10 +55,15 @@ export const ProductDetail = () => {
         console.log("user: ", user.data.id, " quantity: ", quantity, " size: ", sizeId, "product: ", product.product.id);
         const body = { productId, quantity, sizeId };
         const res = await addProductToCart({ body, userId: user.data.id }).unwrap();
-        navigate('/cart');
+
+        if(res.success === false)
+          message.error(res.message);
+        else {
+          navigate('/cart');
+        }
       }
       else {
-        console.log("Choose size, please!")
+        message.error('Choose size, please!');
       }
     }
     else {
@@ -129,11 +132,11 @@ export const ProductDetail = () => {
 
 
               <div className="size-options flex-row">
-                {sizes.map((size, index) => {
+                { sizes.length !== 0 ? sizes.map((size, index) => {
                   return (
                     <div className='size' key={size.id} onClick={() => {setSizeId(size.id)}} style={{background: sizeId === size.id ? 'var(--beige-color)' : 'inherit'}}>{size.name}</div>
                   )
-                })}
+                }): <p>Out of Stock</p> }
               </div>
 
             </div>
