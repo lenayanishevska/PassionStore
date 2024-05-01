@@ -17,6 +17,12 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    size: {
+      field: 'size',
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
+
   }, {
     timestamps: false,
     tableName: 'order_products',

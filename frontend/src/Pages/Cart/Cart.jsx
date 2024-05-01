@@ -5,6 +5,7 @@ import { useCreateOrderMutation, useGetOrderProductsQuery } from '../../redux/Ap
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setOrderInfo } from '../../redux/Reducers/OrderReducer';
+import { message } from 'antd';
 
 export const Cart = () => {
   const user = useSelector(state => state.userLogin.userInfo);
@@ -25,8 +26,13 @@ export const Cart = () => {
   const handleCreateOrder = async () => {
     const res = await createOrder({ userId: user.data.id }).unwrap();
     console.log(res);
-    dispatch(setOrderInfo(res));
-    navigate('/orderInfo');
+    if(res.success === false){
+      message.error(res.message)
+    }
+    else{
+      dispatch(setOrderInfo(res));
+      navigate('/orderInfo');
+    }
   }
 
   useEffect(() => {
@@ -49,6 +55,7 @@ export const Cart = () => {
                   <span>Item</span>
               </div>
               <div className='cart-product-option'>Price</div>
+              <div className='cart-product-option'>Size</div>
               <div className="cart-product-option">Quantity</div>
               <div className="cart-product-option">Total</div>
               <div className="cart-product-option">Delete</div>
