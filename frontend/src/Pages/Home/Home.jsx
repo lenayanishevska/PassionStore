@@ -15,7 +15,7 @@ export const Home = () => {
             <GenderCard image={men} text={"MEN"}></GenderCard>
         </div>
         <hr />
-        <Footer/>
+        {/* <Footer/> */}
     </div>
   )
 }

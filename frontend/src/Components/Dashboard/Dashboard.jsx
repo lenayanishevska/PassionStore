@@ -4,11 +4,15 @@ import './Dashboard.css';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useGetMonthInfoQuery } from '../../redux/Api/AdminApi';
 import { ExpensesForm } from './ExpensesForm';
+import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart';
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 
 export const Dashboard = () => {
   const [chartData, setChartData] = useState({names: ["MON 1", "Mon 2"], values: [1, 2], expenses: [1, 2]});
+  const [orderChart, setOrderChart] = useState({names: ["MON 1", "Mon 2"], values: [1, 2]});
+  const [orderData, setOrderData] = useState({});
+  const [chartOptions, setChartOptions] = useState({});
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { data } = useGetMonthInfoQuery();
@@ -27,13 +31,32 @@ export const Dashboard = () => {
     });
   }
 
+  const reloadOrder = () => {
+    setIsLoading(true);
+    axios.get('http://localhost:5001/api/admin/orderChart').then((data) => {
+      setIsError(false);
+      setIsLoading(false);
+      setOrderChart(data.data.data);
+    }).catch((Error) => {
+      setIsError(true);
+      setIsLoading(false);
+    });
+  }
+
+
   useEffect(() => {
     reload();
   }, []);
 
-  // useEffect(() => {
-  //   reload();
-  // });
+  useEffect(() => {
+    reloadOrder();
+  }, []);
+
+
+
+  useEffect(() => {
+    reload();
+  }, [chartData]);
 
   return (
     <div className='dashboard flex-column'>
@@ -61,7 +84,7 @@ export const Dashboard = () => {
             </div>
         </div>
         <div className="statistics-header">
-            <h3>CHART</h3>
+            <h3>CHARTS</h3>
         </div>
         <div className="expenses-incomes flex-row">
             <div className="chart">
@@ -76,6 +99,23 @@ export const Dashboard = () => {
             <ExpensesForm></ExpensesForm>
 
         </div>
+
+        <div className="order-chart-container">
+          <LineChart
+            width={800}
+            height={350}
+            series={[{ data: orderChart.values , label: 'Month Order Count', area: true, showMark:  true }]}
+            xAxis={[{ scaleType: 'point', data: orderChart.names }]}
+            sx={{
+              [`& .${lineElementClasses.root}`]: {
+                display: 'none',
+              },
+            }}
+          />
+        </div>
+
+
+
     </div>
   )
 }

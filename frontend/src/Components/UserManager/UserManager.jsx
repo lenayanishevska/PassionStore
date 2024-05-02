@@ -26,7 +26,7 @@ export const UserManager = () => {
   const reload = () => {
     setIsLoading(true);
     axios
-      .get(`http://localhost:5001/api/admin/users?page=${page}&itemPerPage=10&sort=${JSON.stringify(sort)}`)
+      .get(`http://localhost:5001/api/admin/users?page=${page}&itemPerPage=20&sort=${JSON.stringify(sort)}`)
       .then((response) => {
         console.log(response.data.data)
         setIsError(false);

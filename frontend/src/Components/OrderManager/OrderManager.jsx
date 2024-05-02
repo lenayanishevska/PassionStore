@@ -62,7 +62,7 @@ export const OrderManager = () => {
   const reload = () => {
     setIsLoading(true);
     axios
-      .get(`http://localhost:5001/api/admin/orders?page=${page}&itemPerPage=10&sort=${JSON.stringify(sort)}&filters=${JSON.stringify(filterParams)}`)
+      .get(`http://localhost:5001/api/admin/orders?page=${page}&itemPerPage=20&sort=${JSON.stringify(sort)}&filters=${JSON.stringify(filterParams)}`)
       .then((response) => {
         setIsError(false);
         setIsLoading(false);
