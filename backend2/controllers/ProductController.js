@@ -198,7 +198,7 @@ class ProductController {
       where: {
           productId,
           quantity: {
-              [Op.gt]: 0, // Перевірка, що кількість товару більше 0
+              [Op.gt]: 0, 
           },
       },
       include: [
@@ -252,11 +252,7 @@ class ProductController {
       },
     });
 
-    console.log("Order Quantity: ", quantity);
-    console.log("Product Quantity: ", productSize.quantity);
-
     if (!productSize || productSize.quantity < quantity) {
-      console.log("EROOOORRRRRRRRRR");
       throw new Error("Insufficient quantity of product in selected size");
     }
 
@@ -332,6 +328,18 @@ class ProductController {
     return list;
   }
 
+  async ordersList(req, res, next) {
+    const userId = req.user.id;
+
+    const list = await Order.findAll({
+      where: {
+        UserId: userId,
+      },
+    });
+
+    return list;
+  }
+
   async createOrder(req, res, next) {
     const userId = req.user.id;
 
@@ -378,7 +386,6 @@ class ProductController {
     for (let orderProduct of orderProductList) {
       const { ProductId, size, quantity } = orderProduct;
 
-      // Оновлення кількості у таблиці ProductSize
       await ProductSize.decrement('quantity', {
         by: quantity,
         where: {
@@ -386,7 +393,6 @@ class ProductController {
         }
       });
 
-      // Отримання і оновлення кількості у таблиці Product
       const product = await Product.findByPk(ProductId);
       if (product) {
         await product.decrement('quantity', { by: quantity });

@@ -130,6 +130,19 @@
   background-color: rgba(107, 41, 42, 0.584)
 }
 
+.order-search {
+  gap: 20px;
+}
+
+.order-search button {
+  height: 35px;
+  width: 120px;
+  border: none;
+  background-color: rgba(48, 44, 41, 0.1);
+  border-radius: 20px;
+  color: #716D69;
+}
+
 
 
 

@@ -20,6 +20,8 @@ router.get("/products/manufacturerList", wrapAsync(productController.manufacture
 router.get("/products/sizeList", wrapAsync(productController.sizelist));
 router.get("/products/attributeList", wrapAsync(productController.attributelist));
 
+router.get("/userOrders", authMiddleware, wrapAsync(productController.ordersList));
+
 router.get("/categories/list", wrapAsync(categoryController.list));
 router.post("/categories/create", authMiddleware, wrapAsync(categoryController.create));
 

@@ -21,7 +21,7 @@ export const CartProduct = ({item, setTotal}) => {
                 <span>{item.Product.name}</span>
             </div>
             <div className='cart-product-option'>$ {item.Product.price}</div>
-            <div className='cart-product-option'>$ {item.size}</div>
+            <div className='cart-product-option'>{item.size}</div>
             <div className="cart-product-option">{item.quantity}</div>
             <div className="cart-product-option">$ {item.amount}</div>
             <div className="cart-product-option cart-delete">

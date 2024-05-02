@@ -11,7 +11,7 @@ export const productsApi = createApi({
                 if (parentCategoryId) queryString += `parentCategoryId=${parentCategoryId}&`;
                 if (sortParams) queryString += `sort=${JSON.stringify(sortParams)}&`;
                 if (filterParams) {
-                    queryString += `filter=${JSON.stringify(filterParams)}&itemPerPage=240&`;
+                    queryString += `filter=${JSON.stringify(filterParams)}&itemPerPage=180&`;
                   };
                 // if(itemPerPage) {
                 //     queryString += `itemPerPage=${itemPerPage}&`;

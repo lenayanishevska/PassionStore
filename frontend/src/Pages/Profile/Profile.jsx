@@ -12,6 +12,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useAddAddressMutation, useGetAddressQuery } from '../../redux/Api/UserAddressApi';
+import { useGetUserOrdersQuery } from '../../redux/Api/OderApi';
+import moment from 'moment'; 
 
 export const Profile = () => {
   const user = useSelector(state => state.userLogin.userInfo);
@@ -19,16 +21,22 @@ export const Profile = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
+  console.log("User id: ", user.data.id)
+
   const { data, refetch} = useGetAddressQuery(user.data.id);
   const address = (data === undefined || data.success === false) ? '' : data.data;
-;
+
+  const userId = user.data.id;
+  const { data: orders} = useGetUserOrdersQuery(userId);
+  const userOrders = orders ? orders.data : [];
+
 
   const [addAddress] = useAddAddressMutation({});
   
 
   useEffect(() => {
     refetch();
-  }, [user.id, refetch]);
+  }, [user.data.id, refetch]);
 
 
   const handleClickOpen = () => {
@@ -39,12 +47,18 @@ export const Profile = () => {
     setOpen(false);
   };
 
-  const handlerLogout = () => {
-    dispatch(logoutAction());
-    toast.success('Logged out successfully!');
-    navigate('/login');
 
-  }
+  const cancelOrder = (orderId) => {
+    // axios({
+    //   method: "DELETE",
+    //   url: "http://localhost:5001/api/admin/updateOrder",
+    //   data: { id: orderId, status: "Completed" },
+    // }).then((data) => {
+    //   reload();
+    // }).catch((error) => {
+    //   alert(error);
+    // });
+  };
 
   return (
     <div className='profile flex-column'>
@@ -88,9 +102,9 @@ export const Profile = () => {
                     const country = formJson.country;
                     const zipcode = formJson.zipcode;
 
-                    console.log(address, city, country, zipcode, user.id);
+                    console.log(address, city, country, zipcode, user.data.id);
 
-                    await addAddress({address: address, city: city, country: country, zipcode: zipcode, userId: user.id}).unwrap();
+                    await addAddress({address: address, city: city, country: country, zipcode: zipcode, userId: user.data.id}).unwrap();
 
                     handleClose();
                   },
@@ -169,7 +183,42 @@ export const Profile = () => {
           {
             user.data.is_admin ?<Link to='/admin'><button className='admin-button'>Admin Panel</button></Link> : <></>
           }
-          <button className='lodout-button'>Log out</button>
+        
+        </div>
+        <hr />
+        <div className="table center-flex user_orders">
+          <table  className="orders-table" >
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Total amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {userOrders.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{moment(item.date).format('YYYY-MM-DD HH:mm:ss')}</td>
+                  <td>$ {item.total_amount}</td>
+                  <td>{item.status}</td>
+                  <td>
+                    {item.status === "Processing" ? (
+                      <button className="complete-order-button"
+                        onClick={() => {
+                          cancelOrder(item.id);
+                        }}
+                      >
+                        CANCEL
+                      </button>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

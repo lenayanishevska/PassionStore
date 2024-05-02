@@ -3,24 +3,34 @@ import axios from "axios";
 import ReactPaginate from 'react-paginate';
 import "react-paginate/theme/basic/react-paginate.css";
 import {  Input, Select} from 'antd';
-const { Option } = Select;
+const { Search } = Input;
 
 
 export const UserManager = () => {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(0);
   const [list, setList] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [sortField, setSortField] = useState('last_name');
   const [sortOrder, setSortOrder] = useState('DESC');
   const [filterParams, setFilterParams] = useState({});
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchEmail, setSearchEmail] = useState('');
+  const [searchValue, setSearchValue] = useState('');
 
   const sort = {
     sortField: sortField,
     sortOrder: sortOrder,
   }
+
+  const onSearch = (value) => {
+    // Фільтруємо список за прізвищем
+    const filteredList = list.filter(item => item.last_name.toLowerCase().includes(value.toLowerCase()));
+    console.log(filteredList);
+    setList(filteredList);
+    // Тут ви можете встановити фільтрований список в стан вашого компонента або зробити щось інше з ним
+  };
 
 
   const reload = () => {
@@ -39,6 +49,11 @@ export const UserManager = () => {
         setIsError(true);
         setIsLoading(false);
       });
+  };
+
+  const handleReset = () => {
+    setSearchValue('');
+    reload();
   };
 
   useEffect(() => {
@@ -65,12 +80,17 @@ export const UserManager = () => {
       </div>
 
       <div className="order-filters-sorts flex-row">
-      <div className="order-search">
-            {/* <Input.Search
-                placeholder="Search"
-                onSearch={handleSearch}
-                enterButton
-            /> */}
+      <div className="order-search flex-row">
+          <Search
+          placeholder="Search"
+          onSearch={onSearch}
+          value={searchValue} 
+          onChange={(e) => setSearchValue(e.target.value)}
+          style={{
+            width: 200,
+          }}
+        />
+          <button onClick={handleReset}>Reset</button>
         </div>
         <div className="order-sort flex-row">
                 

@@ -27,9 +27,9 @@ export const AddOptions = () => {
   return (
     <div className='add-options flex-column'>
         <span className='add-product-header add-options-header'>ADD OPTIONS</span>
-        <div className="flex-row">
-                <span>Export Products in CSV: </span>
-                <Button type="primary" shape="round" icon={<DownloadOutlined />} onClick={handleExport} />
+        <div className="export-csv flex-row">
+                <span className='export-header'>Export Products in CSV: </span>
+                <Button style={{ background: '#716D69' }} type="primary" shape="round" icon={<DownloadOutlined />} onClick={handleExport} />
         </div>
         <div className="options-containers flex-row">
             <AddManufacturer/>

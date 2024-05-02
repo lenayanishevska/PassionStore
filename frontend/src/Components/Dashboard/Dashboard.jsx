@@ -53,11 +53,6 @@ export const Dashboard = () => {
   }, []);
 
 
-
-  useEffect(() => {
-    reload();
-  }, [chartData]);
-
   return (
     <div className='dashboard flex-column'>
         <div className="dashboard-header">
