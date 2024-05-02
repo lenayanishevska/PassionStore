@@ -124,6 +124,13 @@
     color: var(--light-black-color);
 }
 
+.order-chart-container {
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+}
+
 
 
 

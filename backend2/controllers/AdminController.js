@@ -170,6 +170,41 @@ class AdminController {
     };
 }
 
+async orderChart(req, res, next) {
+  let date = moment();
+  const values = [];
+  const names = [];
+
+  for (let index = 0; index < 12; index++) {
+    const startOfMonth = date.clone().startOf("month").format("YYYY-MM-01 00:00:00.000000");
+    const endOfMonth = date.clone().endOf("month").format("YYYY-MM-DD 23:59:59.999999");
+
+    const orders = await Order.findAll({
+      where: {
+        date: {
+          [Op.between]: [startOfMonth, endOfMonth],
+        },
+      },
+    });
+
+    const orderCount = orders.length;
+    values.push(orderCount);
+
+    names.push(date.format("MMM YYYY"));
+    date = date.subtract(1, "month");
+  }
+
+  values.reverse(); // Reverse the values array to match the chronological order of months.
+  names.reverse(); // Reverse the names array to match the chronological order of months.
+
+  return {
+    values,
+    names,
+  };
+}
+
+
+
   async monthInfo(req, res, next) {
     const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
     const endOfMonth = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');

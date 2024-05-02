@@ -47,9 +47,6 @@ export const Navbar = () => {
                     )
                 })}
 
-                <h2 onClick={() => {setMenu("aboutUs")}}>
-                    <Link to='/aboutUs'>About us</Link> {menu === "aboutUs"?<hr/>: <></>}
-                </h2>
             </div>
 
             <div className="nav-middle center-flex">
