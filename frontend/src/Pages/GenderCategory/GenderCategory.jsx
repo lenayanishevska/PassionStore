@@ -4,6 +4,8 @@ import CategoriesSlider from '../../Components/CategoriesSlider/CategoriesSlider
 import { useParams } from "react-router-dom";
 import Products from '../../Components/Products/Products';
 import { useGetCategoriesQuery, useGetManufacturersQuery } from '../../redux/Api/CategoriesApi';
+import {  Input, Select} from 'antd';
+const { Search } = Input;
 
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -19,10 +21,21 @@ export const GenderCategory = () => {
   const [sortOrder, setSortOrder] = useState('ASC');
   const [manufacturer, setManufacturer] = useState();
   const [filterParams, setFilterParams] = useState({});
-  const {category} = useParams();
+  const [list, setList] = useState([]);
   const [value, setValue] = useState([1, 100]);
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(0);
+  const [searchValue, setSearchValue] = useState('');
+  const {category} = useParams();
+
+
+  console.log("List: ", list);
+  
+  const onSearch = (value) => {
+    const filteredList = list.filter(item => item.name.toLowerCase().includes(value.toLowerCase()));
+    console.log(filteredList);
+    setList(filteredList);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -37,6 +50,8 @@ export const GenderCategory = () => {
     setFilterParams({});
     setManufacturer(null);
     setValue([1, 100]);
+    setSearchValue('');
+    setList([]);
   };
 
   const changePage = ({selected}) => {
@@ -100,29 +115,27 @@ export const GenderCategory = () => {
                 value={value}
                 onChange={handleChange}
                 valueLabelDisplay="auto"
-                // getAriaValueText={valuetext}
-                min={1} // Мінімальне значення
-                max={1000} // Максимальне значення
+                min={1} 
+                max={1000}
                 sx={{
-                  // Зміна колірних властивостей для слайдера
                   '& .MuiSlider-thumb': {
-                      color: '#AC5656', // Колір для кульки-вказівника
+                      color: '#AC5656',
                       '&:hover, &.Mui-focusVisible': {
-                        boxShadow: '0px 0px 0px 8px rgba(172, 86, 86, 0.16)', // Колір підсвітки кульки при наведенні або фокусі
+                        boxShadow: '0px 0px 0px 8px rgba(172, 86, 86, 0.16)',
                     },
                   },
                   '& .MuiSlider-track': {
-                      color: '#AC5656', // Колір для заповненої частини слайдера
+                      color: '#AC5656',
                   },
                   '& .MuiSlider-rail': {
-                      color: '#ccc', // Колір для незаповненої частини слайдера
+                      color: '#ccc', 
                   },
                   '& .MuiSlider-valueLabel': {
-                      color: '#AC5656', // Колір для мітки значення
+                      color: '#AC5656', 
                   },
                   '& .MuiSlider-valueLabel': {
-                    color: '#AC5656', // Колір для мітки значення
-                    backgroundColor: '#B8B2AA', // Колір формочки з цифрою, що з'являється
+                    color: '#AC5656',
+                    backgroundColor: '#B8B2AA',
                   },
               }}
               />
@@ -133,30 +146,61 @@ export const GenderCategory = () => {
         <div className="catalog flex-column">
           <div className="catalog-header flex-row">
             <h2>{header} Cloth</h2>
-            <div className='sort flex-row'>
-              <h3>Sort by:</h3>
-              <select onChange={(e) => {
-                const [option, order] = e.target.value.split(' ');
-                setSortField(option);
-                setSortOrder(order);
-              }}>
-                <option value="name ASC">option</option>
-                <option value="price ASC">price (asc)</option>
-                <option value="price DESC">price (desc)</option>
-                <option value="name ASC">name (asc)</option>
-                <option value="name DESC">name (desc)</option>
-              </select>
+            <div className="order-search flex-row">
+              <Search
+              placeholder="Search"
+              onSearch={onSearch}
+              value={searchValue} 
+              onChange={(e) => setSearchValue(e.target.value)}
+              style={{
+                width: 200,
+              }}
+              />
+            </div>
+            <div className="order-sort flex-row">
+                    
+                    <Select
+                        onChange={(value) => {
+                            const [option, order] = value.split(' ');
+                            setSortField(option);
+                            setSortOrder(order);
+                        }}
+                        placeholder='Sort By'
+                        style={{
+                            width: 150,
+                        }}
+                        options={[
+                            {
+                            value: 'name ASC',
+                            label: 'Name (asc)',
+                            },
+                            {
+                            value: 'name DESC',
+                            label: 'Name (desc)',
+                            },
+                            {
+                            value: 'price ASC',
+                            label: 'Price (asc)',
+                            },
+                            {
+                            value: 'price DESC',
+                            label: 'Price (desc)',
+                            },
+                        ]}
+                        
+                    />
             </div>
           </div>
-          <div className="products-list">
-            <Products params={productParams} setPage={setPage} setPageCount={setPageCount} page={page}/>
-            <div className="order-paginator">
+
+          <div className="products-list flex-column">
+            <Products params={productParams} setPage={setPage} setPageCount={setPageCount} page={page} setList={setList} list={list}/>
+            <div className="catalog-paginator">
 
               <ReactPaginate
               breakLabel="..."
               nextLabel="next >"
               onPageChange={changePage}
-              pageRangeDisplayed={5}
+              pageRangeDisplayed={500}
               pageCount={pageCount}
               previousLabel="< previous"
               renderOnZeroPageCount={null}

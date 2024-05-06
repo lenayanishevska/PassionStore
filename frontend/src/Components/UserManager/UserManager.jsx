@@ -10,13 +10,11 @@ export const UserManager = () => {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(0);
   const [list, setList] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [sortField, setSortField] = useState('last_name');
   const [sortOrder, setSortOrder] = useState('DESC');
   const [filterParams, setFilterParams] = useState({});
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchEmail, setSearchEmail] = useState('');
   const [searchValue, setSearchValue] = useState('');
 
   const sort = {
@@ -25,11 +23,9 @@ export const UserManager = () => {
   }
 
   const onSearch = (value) => {
-    // Фільтруємо список за прізвищем
     const filteredList = list.filter(item => item.last_name.toLowerCase().includes(value.toLowerCase()));
     console.log(filteredList);
     setList(filteredList);
-    // Тут ви можете встановити фільтрований список в стан вашого компонента або зробити щось інше з ним
   };
 
 
@@ -38,7 +34,6 @@ export const UserManager = () => {
     axios
       .get(`http://localhost:5001/api/admin/users?page=${page}&itemPerPage=20&sort=${JSON.stringify(sort)}`)
       .then((response) => {
-        console.log(response.data.data)
         setIsError(false);
         setIsLoading(false);
         setList(response.data.data.list);

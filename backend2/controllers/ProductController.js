@@ -328,6 +328,38 @@ class ProductController {
     return list;
   }
 
+  async deleteFromOrders(req, res, next) {
+    console.log("Query:: ", req.query);
+    const querySchema = Joi.object({
+      orderId: Joi.number().required(),
+    });
+
+    const { orderId } = await querySchema.validateAsync(req.query);
+
+    console.log("Order Id: ", orderId);
+
+    const order = await Order.findOne({
+      where: {
+        id: orderId
+      },
+    });
+
+    let item;
+
+    if(order.status === 'Processing') {
+      item = await Order.destroy({
+        where: {
+          id: orderId,
+        },
+      });
+    }
+    else{
+      throw new Error("Order already completed");
+    }
+
+    return item;
+  }
+
   async ordersList(req, res, next) {
     const userId = req.user.id;
 

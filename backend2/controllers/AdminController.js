@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const moment = require("moment");
-const { Order, OrderProduct, User, UserAddress, Income, Expense } = require("../models");
+const { Order, OrderProduct, User, UserAddress, Income, Expense, Product, Manufacturer } = require("../models");
 const Joi = require('joi');
 const { sequelize } = require("../models");
 
@@ -204,6 +204,52 @@ async orderChart(req, res, next) {
 }
 
 
+async brandChart(req, res, next) {
+  const startOfMonth = moment().startOf('month').format('YYYY-MM-DD 00:00:00');
+  const endOfMonth = moment().endOf('month').format('YYYY-MM-DD 23:59:59');
+
+  // Отримуємо дані з бази даних
+  const brandData = await OrderProduct.findAll({
+    attributes: [
+      [sequelize.literal('"products"."ManufacturerId"'), 'ManufacturerId'], // Використовуємо "Product.ManufacturerId" через асоціацію
+      [sequelize.fn('sum', sequelize.col('quantity')), 'totalQuantity']
+    ],
+    include: [
+      {
+        model: Order,
+        attributes: [],
+        where: {
+          date: {
+            [Op.between]: [startOfMonth, endOfMonth]
+          }
+        }
+      },
+      {
+        model: Product,
+        attributes: [],
+        include: [
+          {
+            model: Manufacturer,
+            attributes: [],
+            as: 'Manufacturer'
+          }
+        ]
+      }
+    ],
+    group: ['Product.ManufacturerId'], // Групуємо за ManufacturerId у таблиці Product
+    raw: true
+  });
+
+  // Перетворюємо дані в очікуваний формат
+  const data = brandData.map(item => ({
+    value: parseInt(item.totalQuantity),
+    label: item['Product.Manufacturer.name'] // Використовуємо "Product.Manufacturer.name" через асоціацію
+  }));
+
+  return data;
+}
+
+
 
   async monthInfo(req, res, next) {
     const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -217,10 +263,6 @@ async orderChart(req, res, next) {
     });
 
     const orderCount = orders.length;
-    // const totalAmountSum = orders.reduce((val, order) => {
-    //   console.log(order, val);
-    //   return +order.total_amount + +val;
-    // }, 0);
 
     const totalAmountSum = await Income.sum('amount', {
       where: {
@@ -239,7 +281,6 @@ async orderChart(req, res, next) {
       },
     });
 
-    // Сума усіх товарів у всіх замовленнях за поточний місяць
     const totalProductCount = orderProducts.reduce((val, orderProduct) => {
       return orderProduct.quantity + val;
     }, 0);

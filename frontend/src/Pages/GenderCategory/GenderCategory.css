@@ -78,3 +78,13 @@
     color: var(--light-black-color);
 }
 
+.products-list {
+    gap: 50px
+}
+
+.catalog-paginator {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+

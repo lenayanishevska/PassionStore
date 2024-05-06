@@ -5,7 +5,7 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { useGetMonthInfoQuery } from '../../redux/Api/AdminApi';
 import { ExpensesForm } from './ExpensesForm';
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart';
-import { DownloadOutlined } from '@ant-design/icons';
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { Button } from 'antd';
 
 export const Dashboard = () => {
@@ -18,6 +18,7 @@ export const Dashboard = () => {
   const { data } = useGetMonthInfoQuery();
   const statistic = data ? data.data : '';
   const income = statistic.totalAmountSum;
+
 
   const reload = () => {
     setIsLoading(true);
@@ -80,7 +81,9 @@ export const Dashboard = () => {
         </div>
         <div className="statistics-header">
             <h3>CHARTS</h3>
+
         </div>
+        <span className='chart-header'>Incomes/Expenses</span>
         <div className="expenses-incomes flex-row">
             <div className="chart">
                 <BarChart
@@ -95,21 +98,43 @@ export const Dashboard = () => {
 
         </div>
 
-        <div className="order-chart-container">
-          <LineChart
-            width={800}
-            height={350}
-            series={[{ data: orderChart.values , label: 'Month Order Count', area: true, showMark:  true }]}
-            xAxis={[{ scaleType: 'point', data: orderChart.names }]}
-            sx={{
-              [`& .${lineElementClasses.root}`]: {
-                display: 'none',
-              },
-            }}
-          />
+        <div className="orders-charts flex-row">
+          <div className="order-chart-container">
+            <LineChart
+              width={800}
+              height={350}
+              series={[{ data: orderChart.values , label: 'Month Order Count', area: true, showMark:  true }]}
+              xAxis={[{ scaleType: 'point', data: orderChart.names }]}
+              sx={{
+                [`& .${lineElementClasses.root}`]: {
+                  display: 'none',
+                },
+              }}
+            />
+          </div>
+          <div className="brand-chart">
+            <PieChart
+              series={[
+                {
+                  data: [
+                    {value: 10, label: 'series A' },
+                    { value: 15, label: 'series B' },
+                    { value: 20, label: 'series C' },
+                    // { id: 3, value: 10, label: 'series A' },
+                    // { id: 4, value: 15, label: 'series B' },
+                    // { id: 5, value: 20, label: 'series C' },
+                    // { id: 6, value: 10, label: 'series A' },
+                    // { id: 7, value: 15, label: 'series B' },
+                    // { id: 8, value: 20, label: 'series C' },
+                    // { id: 9, value: 20, label: 'series C' },
+                  ],
+                },
+              ]}
+              width={600}
+              height={400}
+            />
+          </div>
         </div>
-
-
 
     </div>
   )

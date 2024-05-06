@@ -16,11 +16,12 @@ router.post("/products/create", authMiddleware, wrapAsync(productController.crea
 router.post("/products/createProduct", wrapAsync(productController.createProduct));
 router.get("/products/getById", wrapAsync(productController.getById));
 router.delete("/products/deleteFromCart", authMiddleware, wrapAsync(productController.deleteFromCart));
+router.delete("/deleteFromUserOrders", wrapAsync(productController.deleteFromOrders));
 router.get("/products/manufacturerList", wrapAsync(productController.manufacturerlist));
 router.get("/products/sizeList", wrapAsync(productController.sizelist));
 router.get("/products/attributeList", wrapAsync(productController.attributelist));
 
-router.get("/userOrders", authMiddleware, wrapAsync(productController.ordersList));
+router.get("/userOrders",authMiddleware, wrapAsync(productController.ordersList));
 
 router.get("/categories/list", wrapAsync(categoryController.list));
 router.post("/categories/create", authMiddleware, wrapAsync(categoryController.create));

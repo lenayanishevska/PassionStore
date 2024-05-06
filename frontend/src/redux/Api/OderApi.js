@@ -32,6 +32,12 @@ export const orderApi = createApi({
                 method: 'DELETE',
             }),
         }),
+        deleteUserOrder: build.mutation({
+            query: ({ orderId }) => ({
+                url: `shop/products/deleteFromCart?${orderId ? `orderId=${orderId}` : ''}`,
+                method: 'DELETE',
+            }),
+        }),
         createOrder: build.mutation({
             query: ({ userId }) => ({
                 url: `shop/products/createOrder?${userId ? `userId=${userId}` : ''}`,

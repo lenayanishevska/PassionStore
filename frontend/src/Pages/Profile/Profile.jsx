@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import './Profile.css'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector} from 'react-redux';
-import { logoutAction } from '../../redux/Actions/UserActions';
-import toast from 'react-hot-toast';
+import axios from "axios";
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -20,6 +19,8 @@ export const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   console.log("User id: ", user.data.id)
 
@@ -29,6 +30,7 @@ export const Profile = () => {
   const userId = user.data.id;
   const { data: orders} = useGetUserOrdersQuery(userId);
   const userOrders = orders ? orders.data : [];
+
 
 
   const [addAddress] = useAddAddressMutation({});
@@ -47,17 +49,39 @@ export const Profile = () => {
     setOpen(false);
   };
 
+  // const reload = () => {
+  //   setIsLoading(true);
+  //   axios
+  //     .get(`http://localhost:5001/api/admin/orders?userId=${userId}`)
+  //     .then((response) => {
+  //       setIsError(false);
+  //       setIsLoading(false);
+  //       setList(response.data.data.list);
+  //       setPageCount(response.data.data.pageCount);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //       setIsError(true);
+  //       setIsLoading(false);
+  //     });
+  // };
+
+  // useEffect(() => {
+  //   reload();
+  // }, []);
+
+
 
   const cancelOrder = (orderId) => {
-    // axios({
-    //   method: "DELETE",
-    //   url: "http://localhost:5001/api/admin/updateOrder",
-    //   data: { id: orderId, status: "Completed" },
-    // }).then((data) => {
-    //   reload();
-    // }).catch((error) => {
-    //   alert(error);
-    // });
+    axios({
+      method: "DELETE",
+      url: `http://localhost:5001/api/shop/deleteFromUserOrders?orderId=${orderId}`,
+      // data: { orderId: orderId},
+    }).then((data) => {
+      // reload();
+    }).catch((error) => {
+      alert(error);
+    });
   };
 
   return (
@@ -159,7 +183,7 @@ export const Profile = () => {
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleClose}>Cancel</Button>
-                  <Button type="submit">Subscribe</Button>
+                  <Button type="submit">Add</Button>
                 </DialogActions>
               </Dialog>
           </div>
@@ -186,8 +210,9 @@ export const Profile = () => {
         
         </div>
         <hr />
-        <div className="table center-flex user_orders">
-          <table  className="orders-table" >
+        <div className="center-flex user_orders">
+          <span>YOUR ORDERS</span>
+          <table  className="orders-table user-orders-table" >
             <thead>
               <tr>
                 <th>#</th>
