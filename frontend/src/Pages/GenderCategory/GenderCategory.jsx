@@ -26,15 +26,12 @@ export const GenderCategory = () => {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(0);
   const [searchValue, setSearchValue] = useState('');
+  const [searchInputValue, setSearchInputValue] = useState('');
   const {category} = useParams();
 
-
-  console.log("List: ", list);
   
   const onSearch = (value) => {
-    const filteredList = list.filter(item => item.name.toLowerCase().includes(value.toLowerCase()));
-    console.log(filteredList);
-    setList(filteredList);
+    setSearchValue(value);
   };
 
   const handleChange = (event, newValue) => {
@@ -50,8 +47,8 @@ export const GenderCategory = () => {
     setFilterParams({});
     setManufacturer(null);
     setValue([1, 100]);
+    setSearchInputValue('');
     setSearchValue('');
-    setList([]);
   };
 
   const changePage = ({selected}) => {
@@ -74,6 +71,7 @@ export const GenderCategory = () => {
     category: category,
     sortParams: sortParams,
     filterParams: filterParams,
+    searchValue: searchValue,
   };
 
   const header = category === '1'? 'Men\'s': 'Women\'s';
@@ -150,8 +148,8 @@ export const GenderCategory = () => {
               <Search
               placeholder="Search"
               onSearch={onSearch}
-              value={searchValue} 
-              onChange={(e) => setSearchValue(e.target.value)}
+              value={searchInputValue} 
+              onChange={(e) => setSearchInputValue(e.target.value)}
               style={{
                 width: 200,
               }}

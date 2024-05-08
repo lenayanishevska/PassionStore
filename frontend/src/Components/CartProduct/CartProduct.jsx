@@ -4,11 +4,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useDeleteProductFromCartMutation } from '../../redux/Api/OderApi';
 import { message } from 'antd';
 
-export const CartProduct = ({item, setTotal}) => {
+export const CartProduct = ({item, reload}) => {
   const [deleteProductFromCart] = useDeleteProductFromCartMutation();
 
   const handleDelete = async (orderProductId) => {
     const res = await deleteProductFromCart({orderProductId}).unwrap();
+    reload();
     console.log(res);
     // message.info(res.message);
   }

@@ -19,6 +19,7 @@ export const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [list, setList] = useState([]);
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,7 +39,7 @@ export const Profile = () => {
 
   useEffect(() => {
     refetch();
-  }, [user.data.id, refetch]);
+  }, [user.data.id]);
 
 
   const handleClickOpen = () => {
@@ -49,36 +50,35 @@ export const Profile = () => {
     setOpen(false);
   };
 
-  // const reload = () => {
-  //   setIsLoading(true);
-  //   axios
-  //     .get(`http://localhost:5001/api/admin/orders?userId=${userId}`)
-  //     .then((response) => {
-  //       setIsError(false);
-  //       setIsLoading(false);
-  //       setList(response.data.data.list);
-  //       setPageCount(response.data.data.pageCount);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       setIsError(true);
-  //       setIsLoading(false);
-  //     });
-  // };
+  const reload = () => {
+    setIsLoading(true);
+    axios
+      .get(`http://localhost:5001/api/shop/userOrders?userId=${userId}`)
+      .then((response) => {
+        console.log(response)
+        setIsError(false);
+        setIsLoading(false);
+        setList(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsError(true);
+        setIsLoading(false);
+      });
+  };
 
-  // useEffect(() => {
-  //   reload();
-  // }, []);
-
+  useEffect(() => {
+    reload();
+  }, []);
 
 
   const cancelOrder = (orderId) => {
     axios({
       method: "DELETE",
       url: `http://localhost:5001/api/shop/deleteFromUserOrders?orderId=${orderId}`,
-      // data: { orderId: orderId},
     }).then((data) => {
-      // reload();
+      console.log(data);
+      reload();
     }).catch((error) => {
       alert(error);
     });
@@ -125,8 +125,6 @@ export const Profile = () => {
                     const city = formJson.city;
                     const country = formJson.country;
                     const zipcode = formJson.zipcode;
-
-                    console.log(address, city, country, zipcode, user.data.id);
 
                     await addAddress({address: address, city: city, country: country, zipcode: zipcode, userId: user.data.id}).unwrap();
 
@@ -223,7 +221,7 @@ export const Profile = () => {
               </tr>
             </thead>
             <tbody>
-              {userOrders.map((item) => (
+              {list.map((item) => (
                 <tr key={item.id}>
                   <td>{item.id}</td>
                   <td>{moment(item.date).format('YYYY-MM-DD HH:mm:ss')}</td>

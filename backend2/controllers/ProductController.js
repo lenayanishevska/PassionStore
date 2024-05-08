@@ -24,14 +24,13 @@ class ProductController {
       filter: Joi.string().optional(),
       itemPerPage: Joi.number().default(10),
       page: Joi.number().default(0),
+      name: Joi.string().optional(), 
     });
-
-    const { parentCategoryId, sort, filter,itemPerPage, page } = await querySchema.validateAsync(
-      req.query
-    );
-
+    
+    const { parentCategoryId, sort, filter, itemPerPage, page, name } = await querySchema.validateAsync(req.query);
+    
     const where = {};
-
+    
     if (parentCategoryId) {
       const categories = await Category.findAll({
         where: { parentCategoryId },
@@ -39,13 +38,12 @@ class ProductController {
       const categoryIds = categories.map((category) => category.id);
       where.CategoryId = categoryIds;
     }
-
+    
     if (filter) {
-      const { CategoryId, manufacturer, fromPrice, toPrice } =
-        JSON.parse(filter);
-
+      const { CategoryId, manufacturer, fromPrice, toPrice } = JSON.parse(filter);
+    
       if (CategoryId) {
-        where.CategoryId = CategoryId; 
+        where.CategoryId = CategoryId;
       }
       if (manufacturer) {
         where.ManufacturerId = manufacturer;
@@ -54,26 +52,34 @@ class ProductController {
         where.price = { [Op.between]: [fromPrice, toPrice] };
       }
     }
-
-
+    
+    if (name) {
+      where.name = { [Op.iLike]: `%${name}%` }; // Пошук за ім'ям (name)
+    }
+    
     let order = [];
     if (sort) {
       const { sortField, sortOrder } = JSON.parse(sort);
       order = [[sortField, sortOrder]];
     }
-
-    const list = await Product.findAll({ where, order, limit: itemPerPage, offset: page * itemPerPage, });
-
+    
+    const list = await Product.findAll({
+      where,
+      order,
+      limit: itemPerPage,
+      offset: page * itemPerPage,
+    });
+    
     const totalCount = await Product.count({ where });
-
-    const pageCount = Math.ceil(totalCount/ itemPerPage);
-
+    
+    const pageCount = Math.ceil(totalCount / itemPerPage);
+    
     return {
       list,
       totalCount,
       itemPerPage,
       pageCount,
-    };
+    };    
   }
 
   async create(req, res, next) {
@@ -223,7 +229,6 @@ class ProductController {
   }
 
   async addToCart(req, res, next) {
-    console.log("Body  ", req.body);
     const bodySchema = Joi.object({
       productId: Joi.number().required(),
       quantity: Joi.number().required(),
@@ -315,7 +320,11 @@ class ProductController {
   }
 
   async cartList(req, res, next) {
-    const userId = req.user.id;
+    const querySchema = Joi.object({
+      userId: Joi.number().required(),
+    });
+
+    const { userId } = await querySchema.validateAsync(req.query); 
 
     const list = await OrderProduct.findAll({
       where: {
@@ -329,20 +338,41 @@ class ProductController {
   }
 
   async deleteFromOrders(req, res, next) {
-    console.log("Query:: ", req.query);
     const querySchema = Joi.object({
       orderId: Joi.number().required(),
     });
 
     const { orderId } = await querySchema.validateAsync(req.query);
 
-    console.log("Order Id: ", orderId);
-
     const order = await Order.findOne({
       where: {
         id: orderId
       },
     });
+
+    const orderProductList = await OrderProduct.findAll({
+      where: {
+        OrderId: orderId,
+      },
+      include: [{ model: Product }],
+    });
+
+    for (let orderProduct of orderProductList) {
+      const { ProductId, size, quantity } = orderProduct;
+
+      await ProductSize.increment('quantity', {
+        by: quantity,
+        where: {
+          id: size,
+        }
+      });
+
+      const product = await Product.findByPk(ProductId);
+      if (product) {
+        await product.increment('quantity', { by: quantity });
+      }
+    }
+
 
     let item;
 
@@ -361,7 +391,11 @@ class ProductController {
   }
 
   async ordersList(req, res, next) {
-    const userId = req.user.id;
+    const querySchema = Joi.object({
+      userId: Joi.number().required(),
+    });
+
+    const { userId } = await querySchema.validateAsync(req.query); 
 
     const list = await Order.findAll({
       where: {
@@ -370,7 +404,7 @@ class ProductController {
     });
 
     return list;
-  }
+}
 
   async createOrder(req, res, next) {
     const userId = req.user.id;
@@ -515,14 +549,133 @@ class ProductController {
     return list;
   }
 
+  async updateManufacturer(req, res, next) {
+    console.log(req.body);
+    const bodySchema = Joi.object({
+      id: Joi.number().required(),
+      name: Joi.string().required(),
+    });
+
+    const { id, name } = await bodySchema.validateAsync(req.body);
+
+    const manufacturer = await Manufacturer.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!manufacturer) {
+      throw new Error('Manufacturer not found');
+    }
+
+    await Manufacturer.update({
+      name,
+    }, {
+      where: {
+        id,
+      },
+    });
+
+    return true;
+  }
+
   async sizelist(req, res, next) {
     const list = await Size.findAll();
     return list;
   }
 
+  async updateSize(req, res, next) {
+    console.log(req.body);
+    const bodySchema = Joi.object({
+      id: Joi.number().required(),
+      name: Joi.string().required(),
+    });
+
+    const { id, name } = await bodySchema.validateAsync(req.body);
+
+    const size = await Size.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!size) {
+      throw new Error('Size not found');
+    }
+
+    await Size.update({
+      name,
+    }, {
+      where: {
+        id,
+      },
+    });
+
+    return true;
+  }
+
   async attributelist(req, res, next) {
     const list = await Attribute.findAll();
     return list;
+  }
+
+  async updateAttribute(req, res, next) {
+    const bodySchema = Joi.object({
+      id: Joi.number().required(),
+      name: Joi.string().required(),
+    });
+
+    const { id, name } = await bodySchema.validateAsync(req.body);
+
+    const size = await Attribute.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!size) {
+      throw new Error('Attribute not found');
+    }
+
+    await Attribute.update({
+      name,
+    }, {
+      where: {
+        id,
+      },
+    });
+
+    return true;
+  }
+
+
+  async updateCategory(req, res, next) {
+    const bodySchema = Joi.object({
+      id: Joi.number().required(),
+      name: Joi.string().required(),
+    });
+
+    const { id, name } = await bodySchema.validateAsync(req.body);
+
+    const size = await Category.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!size) {
+      throw new Error('Category not found');
+    }
+
+    await Category.update({
+      name,
+    }, {
+      where: {
+        id,
+      },
+    });
+
+    return true;
   }
 }
 

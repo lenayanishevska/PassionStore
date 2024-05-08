@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const moment = require("moment");
-const { Order, OrderProduct, User, UserAddress, Income, Expense, Product, Manufacturer } = require("../models");
+const { Order, OrderProduct, User, UserAddress, Income, Expense, Product, Manufacturer, ExpensesCategory} = require("../models");
 const Joi = require('joi');
 const { sequelize } = require("../models");
 
@@ -137,6 +137,12 @@ class AdminController {
       },
     });
 
+    await Income.create({
+      amount: order.total_amount,
+      date: new Date(),
+      OrderId: order.id,
+    });
+
     return true;
   }
 
@@ -194,8 +200,8 @@ async orderChart(req, res, next) {
     date = date.subtract(1, "month");
   }
 
-  values.reverse(); // Reverse the values array to match the chronological order of months.
-  names.reverse(); // Reverse the names array to match the chronological order of months.
+  values.reverse(); 
+  names.reverse(); 
 
   return {
     values,
@@ -205,51 +211,32 @@ async orderChart(req, res, next) {
 
 
 async brandChart(req, res, next) {
-  const startOfMonth = moment().startOf('month').format('YYYY-MM-DD 00:00:00');
-  const endOfMonth = moment().endOf('month').format('YYYY-MM-DD 23:59:59');
+  const currentDate = moment();
+  const startOfMonth = currentDate.clone().startOf('month').format('YYYY-MM-DD');
+  const endOfMonth = currentDate.clone().endOf('month').format('YYYY-MM-DD');
 
-  // Отримуємо дані з бази даних
-  const brandData = await OrderProduct.findAll({
-    attributes: [
-      [sequelize.literal('"products"."ManufacturerId"'), 'ManufacturerId'], // Використовуємо "Product.ManufacturerId" через асоціацію
-      [sequelize.fn('sum', sequelize.col('quantity')), 'totalQuantity']
-    ],
-    include: [
-      {
-        model: Order,
-        attributes: [],
-        where: {
-          date: {
-            [Op.between]: [startOfMonth, endOfMonth]
-          }
-        }
-      },
-      {
-        model: Product,
-        attributes: [],
-        include: [
-          {
-            model: Manufacturer,
-            attributes: [],
-            as: 'Manufacturer'
-          }
-        ]
-      }
-    ],
-    group: ['Product.ManufacturerId'], // Групуємо за ManufacturerId у таблиці Product
-    raw: true
-  });
+  const categories = await ExpensesCategory.findAll();
 
-  // Перетворюємо дані в очікуваний формат
-  const data = brandData.map(item => ({
-    value: parseInt(item.totalQuantity),
-    label: item['Product.Manufacturer.name'] // Використовуємо "Product.Manufacturer.name" через асоціацію
-  }));
+  const data = [];
+
+  for (const category of categories) {
+      const categoryExpenses = await Expense.count({
+          where: {
+              "ExpensesCategoryId": category.id,
+              "date": {
+                  [Op.between]: [startOfMonth, endOfMonth]
+              }
+          }
+      });
+
+      data.push({
+          value: categoryExpenses,
+          label: category.category
+      });
+  }
 
   return data;
 }
-
-
 
   async monthInfo(req, res, next) {
     const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -306,14 +293,11 @@ async brandChart(req, res, next) {
 
   async exportOrdersWithUsers(req, res, next) {
     try {
-        // Виконання запиту SQL
         const query = "SELECT * FROM export_product_category_manufacturer()";
         const result = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
         
-        // Перетворення кожного об'єкта у рядок CSV
         const csvRows = result.map(row => Object.values(row).join(','));
 
-        // Створення рядка CSV з рядками
         const csvData = csvRows.join('\n');
 
         res.set({

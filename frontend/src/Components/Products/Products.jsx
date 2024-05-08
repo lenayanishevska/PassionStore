@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 import { useGetProductsQuery} from '../../redux/Api/ProductsApi';
 
 export default function Products({params, setPage, setPageCount, page, setList, list}) {
-  const {category, sortParams, filterParams} = params;
+  const {category, sortParams, filterParams, searchValue} = params;
 
-  const { data, isLoading, isError } = useGetProductsQuery({parentCategoryId: category, sortParams: sortParams, filterParams: filterParams, page});
+  const { data, isLoading, isError } = useGetProductsQuery({parentCategoryId: category, sortParams: sortParams, filterParams: filterParams, page, name: searchValue});
   const products = data && data !== undefined ? data.data : null;
 
 

@@ -11,6 +11,7 @@ import { Button } from 'antd';
 export const Dashboard = () => {
   const [chartData, setChartData] = useState({names: ["MON 1", "Mon 2"], values: [1, 2], expenses: [1, 2]});
   const [orderChart, setOrderChart] = useState({names: ["MON 1", "Mon 2"], values: [1, 2]});
+  const [expensesChart, setExpensesChart] = useState([]);
   const [orderData, setOrderData] = useState({});
   const [chartOptions, setChartOptions] = useState({});
   const [isError, setIsError] = useState(false);
@@ -18,6 +19,8 @@ export const Dashboard = () => {
   const { data } = useGetMonthInfoQuery();
   const statistic = data ? data.data : '';
   const income = statistic.totalAmountSum;
+
+  console.log("Expenses: ", expensesChart);
 
 
   const reload = () => {
@@ -44,6 +47,19 @@ export const Dashboard = () => {
     });
   }
 
+  const reloadExpences = () => {
+    setIsLoading(true);
+    axios.get('http://localhost:5001/api/admin/brandChart').then((data) => {
+      console.log(data);
+      setIsError(false);
+      setIsLoading(false);
+      setExpensesChart(data.data);
+    }).catch((Error) => {
+      setIsError(true);
+      setIsLoading(false);
+    });
+  }
+
 
   useEffect(() => {
     reload();
@@ -51,6 +67,10 @@ export const Dashboard = () => {
 
   useEffect(() => {
     reloadOrder();
+  }, []);
+
+  useEffect(() => {
+    reloadExpences();
   }, []);
 
 
@@ -116,23 +136,20 @@ export const Dashboard = () => {
             <PieChart
               series={[
                 {
-                  data: [
-                    {value: 10, label: 'series A' },
-                    { value: 15, label: 'series B' },
-                    { value: 20, label: 'series C' },
-                    // { id: 3, value: 10, label: 'series A' },
-                    // { id: 4, value: 15, label: 'series B' },
-                    // { id: 5, value: 20, label: 'series C' },
-                    // { id: 6, value: 10, label: 'series A' },
-                    // { id: 7, value: 15, label: 'series B' },
-                    // { id: 8, value: 20, label: 'series C' },
-                    // { id: 9, value: 20, label: 'series C' },
+                  data: expensesChart.length !== 0?  expensesChart.data :[
+                    { id: 0, value: 10, label: 'series A' },
+                    { id: 1, value: 15, label: 'series B' },
+                    { id: 2, value: 20, label: 'series C' },
                   ],
                 },
               ]}
-              width={600}
+              width={500}
               height={400}
+              style={{
+                labels: { distance: -20 } 
+            }}
             />
+
           </div>
         </div>
 
