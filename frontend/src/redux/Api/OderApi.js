@@ -16,6 +16,9 @@ export const orderApi = createApi({
         getOrderProducts: build.query({
             query: (userId = '') => `shop/products/cartProductList?${userId && `userId=${userId}`}`,
         }),
+        getUserOrders: build.query({
+            query: (userId = '') => `shop/userOrders?${userId && `userId=${userId}`}`,
+        }),
         addProductToCart: build.mutation({
             query: ({ body, userId }) => ({
                 url: `shop/products/addProductToCart?${userId ? `userId=${userId}` : ''}`,
@@ -29,6 +32,12 @@ export const orderApi = createApi({
                 method: 'DELETE',
             }),
         }),
+        deleteUserOrder: build.mutation({
+            query: ({ orderId }) => ({
+                url: `shop/products/deleteFromCart?${orderId ? `orderId=${orderId}` : ''}`,
+                method: 'DELETE',
+            }),
+        }),
         createOrder: build.mutation({
             query: ({ userId }) => ({
                 url: `shop/products/createOrder?${userId ? `userId=${userId}` : ''}`,
@@ -37,4 +46,4 @@ export const orderApi = createApi({
         }),
     }),
 });
-export const {useGetOrderProductsQuery, useAddProductToCartMutation, useDeleteProductFromCartMutation, useCreateOrderMutation} = orderApi;
+export const {useGetOrderProductsQuery, useAddProductToCartMutation, useDeleteProductFromCartMutation, useCreateOrderMutation, useGetUserOrdersQuery} = orderApi;

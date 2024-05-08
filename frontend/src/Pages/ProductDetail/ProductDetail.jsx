@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef,  useEffect } from 'react'
 import './ProductDetail.css'
 import { useParams } from 'react-router-dom';
 import { Slide } from 'react-slideshow-image';
@@ -10,12 +10,16 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { useNavigate } from 'react-router-dom';
 import { useAddProductToCartMutation } from '../../redux/Api/OderApi.js';
-import { message } from 'antd';
+import { message, InputNumber } from 'antd';
+
 
 export const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [sizeId, setSizeId] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [inStock, setInStock] = useState(true);
+
+  console.log("Quantity: ", quantity);
 
   const toastBC = useRef(null);
   const refs = {
@@ -115,36 +119,33 @@ export const ProductDetail = () => {
         <div className="product-info-details flex-column">
 
           <div className="options-container flex-column">
-
-            {/* <div className="colors flex-column">
-
-              <h3>COLOR</h3>
-
-              <div className="color-options flex-row">
-                <p>Beige</p>
-              </div>
-  
-            </div> */}
-
-            <div className="sizes flex-column">
+            {
+              sizes.length !== 0 ? <div className="sizes flex-column">
 
               <h3>SIZE</h3>
 
 
               <div className="size-options flex-row">
-                { sizes.length !== 0 ? sizes.map((size, index) => {
+                { sizes.map((size, index) => {
                   return (
                     <div className='size' key={size.id} onClick={() => {setSizeId(size.id)}} style={{background: sizeId === size.id ? 'var(--beige-color)' : 'inherit'}}>{size.name}</div>
                   )
-                }): <p>Out of Stock</p> }
+                }) }
               </div>
+
+              </div> : <p className='out-of-stock'>OUT OF STOCK</p>
+            }
+
+            <div className="sizes flex-column">
+
+              <h3>QUANTITY</h3>
+              <InputNumber size="large" min={1} max={10} defaultValue={1} value={quantity} onChange={(value) => {setQuantity(value)}} />
 
             </div>
 
           </div>
-          <input type="number" name="quantity" id="quantity" min="0" value={quantity} onChange={(e) => {setQuantity(e.target.value)}}/>
 
-          <button className='add-to-cart-button' onClick={handleAddToCart}>Add to cart</button>
+          <button className='add-to-cart-button' onClick={handleAddToCart} disabled={sizes.length === 0}>Add to cart</button>
 
         </div>
 
@@ -153,7 +154,7 @@ export const ProductDetail = () => {
 
         <div className="product-attribes flex-column">
           <Panel ref={refs.description} header="DESCRIPTION" toggleable collapsed={true}>
-              <p className="m-0">
+              <p className="attributes-p">
                 {product.product.description}
               </p>
           </Panel>
@@ -163,7 +164,7 @@ export const ProductDetail = () => {
 
         <div className="product-attribes flex-column">
           <Panel ref={refs.brand} header="BRAND" toggleable collapsed={true}>
-              <p className="m-0">
+              <p className="attributes-p">
                 {product.product.Manufacturer.name}
               </p>
           </Panel>
@@ -175,7 +176,7 @@ export const ProductDetail = () => {
           <Panel ref={refs.material} header="DETAILS" toggleable collapsed={true}>
             { product ? product.attributes.map((item, index) => {
                   return (
-                    <p key={index} className="m-0">
+                    <p key={index} className="attributes-p">
                       {item.name} : {item.value}
                     </p>
                   )

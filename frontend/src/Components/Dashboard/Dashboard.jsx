@@ -5,12 +5,13 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { useGetMonthInfoQuery } from '../../redux/Api/AdminApi';
 import { ExpensesForm } from './ExpensesForm';
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart';
-import { DownloadOutlined } from '@ant-design/icons';
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { Button } from 'antd';
 
 export const Dashboard = () => {
   const [chartData, setChartData] = useState({names: ["MON 1", "Mon 2"], values: [1, 2], expenses: [1, 2]});
   const [orderChart, setOrderChart] = useState({names: ["MON 1", "Mon 2"], values: [1, 2]});
+  const [expensesChart, setExpensesChart] = useState([]);
   const [orderData, setOrderData] = useState({});
   const [chartOptions, setChartOptions] = useState({});
   const [isError, setIsError] = useState(false);
@@ -18,6 +19,9 @@ export const Dashboard = () => {
   const { data } = useGetMonthInfoQuery();
   const statistic = data ? data.data : '';
   const income = statistic.totalAmountSum;
+
+  console.log("Expenses: ", expensesChart);
+
 
   const reload = () => {
     setIsLoading(true);
@@ -43,6 +47,19 @@ export const Dashboard = () => {
     });
   }
 
+  const reloadExpences = () => {
+    setIsLoading(true);
+    axios.get('http://localhost:5001/api/admin/brandChart').then((data) => {
+      console.log(data);
+      setIsError(false);
+      setIsLoading(false);
+      setExpensesChart(data.data);
+    }).catch((Error) => {
+      setIsError(true);
+      setIsLoading(false);
+    });
+  }
+
 
   useEffect(() => {
     reload();
@@ -52,11 +69,10 @@ export const Dashboard = () => {
     reloadOrder();
   }, []);
 
-
-
   useEffect(() => {
-    reload();
-  }, [chartData]);
+    reloadExpences();
+  }, []);
+
 
   return (
     <div className='dashboard flex-column'>
@@ -85,7 +101,9 @@ export const Dashboard = () => {
         </div>
         <div className="statistics-header">
             <h3>CHARTS</h3>
+
         </div>
+        <span className='chart-header'>Incomes/Expenses</span>
         <div className="expenses-incomes flex-row">
             <div className="chart">
                 <BarChart
@@ -100,21 +118,40 @@ export const Dashboard = () => {
 
         </div>
 
-        <div className="order-chart-container">
-          <LineChart
-            width={800}
-            height={350}
-            series={[{ data: orderChart.values , label: 'Month Order Count', area: true, showMark:  true }]}
-            xAxis={[{ scaleType: 'point', data: orderChart.names }]}
-            sx={{
-              [`& .${lineElementClasses.root}`]: {
-                display: 'none',
-              },
+        <div className="orders-charts flex-row">
+          <div className="order-chart-container">
+            <LineChart
+              width={800}
+              height={350}
+              series={[{ data: orderChart.values , label: 'Month Order Count', area: true, showMark:  true }]}
+              xAxis={[{ scaleType: 'point', data: orderChart.names }]}
+              sx={{
+                [`& .${lineElementClasses.root}`]: {
+                  display: 'none',
+                },
+              }}
+            />
+          </div>
+          <div className="brand-chart">
+            <PieChart
+              series={[
+                {
+                  data: expensesChart.length !== 0?  expensesChart.data :[
+                    { id: 0, value: 10, label: 'series A' },
+                    { id: 1, value: 15, label: 'series B' },
+                    { id: 2, value: 20, label: 'series C' },
+                  ],
+                },
+              ]}
+              width={500}
+              height={400}
+              style={{
+                labels: { distance: -20 } 
             }}
-          />
+            />
+
+          </div>
         </div>
-
-
 
     </div>
   )

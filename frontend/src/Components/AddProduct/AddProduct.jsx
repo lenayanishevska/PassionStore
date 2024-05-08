@@ -27,8 +27,6 @@ export const AddProduct = () => {
     const [productAttributes, setProductAttributes] = useState([]);
     const [uploading, setUploading] = useState(false);
 
-    console.log(sku, price );
-
     const {data} = useGetSizesQuery({});
     const sizes = data ? data.data : [];
 
@@ -51,6 +49,7 @@ export const AddProduct = () => {
         {
             const newSize = { size: size, quantity: quantity };
             setProductSizes(prevSizes => [...prevSizes, newSize]);
+            message.success('Add attribute successfully')
         }
     };
 

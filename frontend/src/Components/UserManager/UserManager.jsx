@@ -3,7 +3,7 @@ import axios from "axios";
 import ReactPaginate from 'react-paginate';
 import "react-paginate/theme/basic/react-paginate.css";
 import {  Input, Select} from 'antd';
-const { Option } = Select;
+const { Search } = Input;
 
 
 export const UserManager = () => {
@@ -15,12 +15,18 @@ export const UserManager = () => {
   const [filterParams, setFilterParams] = useState({});
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchEmail, setSearchEmail] = useState('');
+  const [searchValue, setSearchValue] = useState('');
 
   const sort = {
     sortField: sortField,
     sortOrder: sortOrder,
   }
+
+  const onSearch = (value) => {
+    const filteredList = list.filter(item => item.last_name.toLowerCase().includes(value.toLowerCase()));
+    console.log(filteredList);
+    setList(filteredList);
+  };
 
 
   const reload = () => {
@@ -28,7 +34,6 @@ export const UserManager = () => {
     axios
       .get(`http://localhost:5001/api/admin/users?page=${page}&itemPerPage=20&sort=${JSON.stringify(sort)}`)
       .then((response) => {
-        console.log(response.data.data)
         setIsError(false);
         setIsLoading(false);
         setList(response.data.data.list);
@@ -39,6 +44,11 @@ export const UserManager = () => {
         setIsError(true);
         setIsLoading(false);
       });
+  };
+
+  const handleReset = () => {
+    setSearchValue('');
+    reload();
   };
 
   useEffect(() => {
@@ -65,12 +75,17 @@ export const UserManager = () => {
       </div>
 
       <div className="order-filters-sorts flex-row">
-      <div className="order-search">
-            {/* <Input.Search
-                placeholder="Search"
-                onSearch={handleSearch}
-                enterButton
-            /> */}
+      <div className="order-search flex-row">
+          <Search
+          placeholder="Search"
+          onSearch={onSearch}
+          value={searchValue} 
+          onChange={(e) => setSearchValue(e.target.value)}
+          style={{
+            width: 200,
+          }}
+        />
+          <button onClick={handleReset}>Reset</button>
         </div>
         <div className="order-sort flex-row">
                 

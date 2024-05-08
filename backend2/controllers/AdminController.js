@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const moment = require("moment");
-const { Order, OrderProduct, User, UserAddress, Income, Expense } = require("../models");
+const { Order, OrderProduct, User, UserAddress, Income, Expense, Product, Manufacturer, ExpensesCategory} = require("../models");
 const Joi = require('joi');
 const { sequelize } = require("../models");
 
@@ -137,6 +137,12 @@ class AdminController {
       },
     });
 
+    await Income.create({
+      amount: order.total_amount,
+      date: new Date(),
+      OrderId: order.id,
+    });
+
     return true;
   }
 
@@ -194,8 +200,8 @@ async orderChart(req, res, next) {
     date = date.subtract(1, "month");
   }
 
-  values.reverse(); // Reverse the values array to match the chronological order of months.
-  names.reverse(); // Reverse the names array to match the chronological order of months.
+  values.reverse(); 
+  names.reverse(); 
 
   return {
     values,
@@ -204,6 +210,33 @@ async orderChart(req, res, next) {
 }
 
 
+async brandChart(req, res, next) {
+  const currentDate = moment();
+  const startOfMonth = currentDate.clone().startOf('month').format('YYYY-MM-DD');
+  const endOfMonth = currentDate.clone().endOf('month').format('YYYY-MM-DD');
+
+  const categories = await ExpensesCategory.findAll();
+
+  const data = [];
+
+  for (const category of categories) {
+      const categoryExpenses = await Expense.count({
+          where: {
+              "ExpensesCategoryId": category.id,
+              "date": {
+                  [Op.between]: [startOfMonth, endOfMonth]
+              }
+          }
+      });
+
+      data.push({
+          value: categoryExpenses,
+          label: category.category
+      });
+  }
+
+  return data;
+}
 
   async monthInfo(req, res, next) {
     const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -217,10 +250,6 @@ async orderChart(req, res, next) {
     });
 
     const orderCount = orders.length;
-    // const totalAmountSum = orders.reduce((val, order) => {
-    //   console.log(order, val);
-    //   return +order.total_amount + +val;
-    // }, 0);
 
     const totalAmountSum = await Income.sum('amount', {
       where: {
@@ -239,7 +268,6 @@ async orderChart(req, res, next) {
       },
     });
 
-    // Сума усіх товарів у всіх замовленнях за поточний місяць
     const totalProductCount = orderProducts.reduce((val, orderProduct) => {
       return orderProduct.quantity + val;
     }, 0);
@@ -265,14 +293,11 @@ async orderChart(req, res, next) {
 
   async exportOrdersWithUsers(req, res, next) {
     try {
-        // Виконання запиту SQL
         const query = "SELECT * FROM export_product_category_manufacturer()";
         const result = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
         
-        // Перетворення кожного об'єкта у рядок CSV
         const csvRows = result.map(row => Object.values(row).join(','));
 
-        // Створення рядка CSV з рядками
         const csvData = csvRows.join('\n');
 
         res.set({

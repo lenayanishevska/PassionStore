@@ -49,6 +49,13 @@
     color: var(--light-black-color);
 }
 
+.chart-header {
+    margin: 10px;
+    font-size: 18px;
+    font-weight: 200;
+    color: var(--dark-grey-color);
+}
+
 .month {
     display: flex;
     justify-content: center;
@@ -124,11 +131,23 @@
     color: var(--light-black-color);
 }
 
-.order-chart-container {
-    padding: 20px;
+.orders-charts {
     width: 100%;
+}
+
+.order-chart-container {
+    padding: 10px;
+    width: 60%;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
+}
+
+
+.brand-chart {
+    padding: 10px;
+    width: 40%;
+    display: flex;
+    justify-content: center;
 }
 
 

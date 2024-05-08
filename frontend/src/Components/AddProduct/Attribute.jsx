@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGetAttributesQuery } from '../../redux/Api/CategoriesApi';
-import {  Select, Input} from 'antd';
+import {  Select, Input, message} from 'antd';
 import './AddProduct.css'
 
 export const Attribute = ({setProductAttributes}) => {
@@ -14,6 +14,7 @@ export const Attribute = ({setProductAttributes}) => {
         {
             const newAttribute = { attribute: attribute, value: value };
             setProductAttributes(prevAttributes => [...prevAttributes, newAttribute]);
+            message.success('Add attribute successfully');
         }
     };
   return (

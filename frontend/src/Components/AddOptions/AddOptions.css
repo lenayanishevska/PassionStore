@@ -55,3 +55,15 @@
     font-weight: 200;
     color: #AC5656;
 }
+
+.export-csv {
+    margin: 5px;
+    gap: 25px;
+    align-items: center;
+}
+
+.export-header {
+    font-size: 16px;
+    color: #716D69;
+}
+

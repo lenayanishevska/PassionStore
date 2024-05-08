@@ -119,6 +119,7 @@ class UserController {
   }
 
   async getUserAddress(req, res, next) {
+    console.log("Query:: ", req.query);
     const querySchema = Joi.object({
       userId: Joi.number(),
     });

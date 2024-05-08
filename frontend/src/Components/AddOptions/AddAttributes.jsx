@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Input } from 'antd';
+import { Button, Modal, Input, Form, } from 'antd';
+import {  EditOutlined } from '@ant-design/icons';
 import axios from "axios";
 
 export const AddAttributes = () => {
@@ -7,8 +8,37 @@ export const AddAttributes = () => {
     const [list, setList] = useState([]);
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [itemId, setItemId] = useState('');
+    const [itemName, setItemName] = useState('');
 
-    console.log(attribute);
+
+
+    const showModal = (itemId, ItemName) => {
+      setIsModalOpen(true);
+      setItemId(itemId);
+      setItemName(ItemName);
+    };
+
+    const handleOk = () => {
+      console.log(itemName);
+      axios({
+        method: "POST",
+        url: "http://localhost:5001/api/shop/attribute/update",
+        data: { id: itemId, name: itemName },
+      }).then((data) => {
+        console.log("Result: ", data);
+        reload();
+      }).catch((error) => {
+        alert(error);
+      });
+      setIsModalOpen(false);
+    };
+
+    const handleCancel = () => {
+      setIsModalOpen(false);
+    };
+
 
     const reload = () => {
         setIsLoading(true);
@@ -62,19 +92,27 @@ export const AddAttributes = () => {
             <table  className="orders-table" >
             <thead>
                 <tr>
-                <th>#</th>
                 <th>Name</th>
+                <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {list.map((item) => (
                 <tr key={item.id}>
-                    <td>{item.id}</td>
                     <td>{item.name}</td>
+                    <td>
+                      <Button type="primary" onClick={() => {
+                        showModal(item.id, item.name);
+                      }} icon={<EditOutlined />} style={{ background: '#716D69' }}>
+                      </Button>
+                    </td>
                 </tr>
                 ))}
             </tbody>
             </table>
+                      <Modal title="Add Size" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                        <Input placeholder="Name" value={itemName} onChange={(e) => setItemName(e.target.value)}/>
+                      </Modal>
       </div>
     </div>
   )

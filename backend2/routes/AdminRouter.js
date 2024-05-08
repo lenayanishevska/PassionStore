@@ -13,5 +13,6 @@ router.post("/updateOrder"/*, authMiddleware*/, wrapAsync(adminController.update
 router.get("/export"/*, authMiddleware*/, wrapAsync(adminController.getOrdersWithUsers));
 router.get("/exportCSV"/*, authMiddleware*/, adminController.exportOrdersWithUsers);
 router.get("/orderChart"/*, authMiddleware*/, wrapAsync(adminController.orderChart));
+router.get("/brandChart"/*, authMiddleware*/, wrapAsync(adminController.brandChart));
 
 module.exports = router;

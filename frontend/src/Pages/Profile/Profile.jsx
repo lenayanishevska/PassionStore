@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import './Profile.css'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector} from 'react-redux';
-import { logoutAction } from '../../redux/Actions/UserActions';
-import toast from 'react-hot-toast';
+import axios from "axios";
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -12,23 +11,35 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useAddAddressMutation, useGetAddressQuery } from '../../redux/Api/UserAddressApi';
+import { useGetUserOrdersQuery } from '../../redux/Api/OderApi';
+import moment from 'moment'; 
 
 export const Profile = () => {
   const user = useSelector(state => state.userLogin.userInfo);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [list, setList] = useState([]);
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  console.log("User id: ", user.data.id)
 
   const { data, refetch} = useGetAddressQuery(user.data.id);
   const address = (data === undefined || data.success === false) ? '' : data.data;
-;
+
+  const userId = user.data.id;
+  const { data: orders} = useGetUserOrdersQuery(userId);
+  const userOrders = orders ? orders.data : [];
+
+
 
   const [addAddress] = useAddAddressMutation({});
   
 
   useEffect(() => {
     refetch();
-  }, [user.id, refetch]);
+  }, [user.data.id]);
 
 
   const handleClickOpen = () => {
@@ -39,12 +50,39 @@ export const Profile = () => {
     setOpen(false);
   };
 
-  const handlerLogout = () => {
-    dispatch(logoutAction());
-    toast.success('Logged out successfully!');
-    navigate('/login');
+  const reload = () => {
+    setIsLoading(true);
+    axios
+      .get(`http://localhost:5001/api/shop/userOrders?userId=${userId}`)
+      .then((response) => {
+        console.log(response)
+        setIsError(false);
+        setIsLoading(false);
+        setList(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsError(true);
+        setIsLoading(false);
+      });
+  };
 
-  }
+  useEffect(() => {
+    reload();
+  }, []);
+
+
+  const cancelOrder = (orderId) => {
+    axios({
+      method: "DELETE",
+      url: `http://localhost:5001/api/shop/deleteFromUserOrders?orderId=${orderId}`,
+    }).then((data) => {
+      console.log(data);
+      reload();
+    }).catch((error) => {
+      alert(error);
+    });
+  };
 
   return (
     <div className='profile flex-column'>
@@ -88,9 +126,7 @@ export const Profile = () => {
                     const country = formJson.country;
                     const zipcode = formJson.zipcode;
 
-                    console.log(address, city, country, zipcode, user.id);
-
-                    await addAddress({address: address, city: city, country: country, zipcode: zipcode, userId: user.id}).unwrap();
+                    await addAddress({address: address, city: city, country: country, zipcode: zipcode, userId: user.data.id}).unwrap();
 
                     handleClose();
                   },
@@ -145,7 +181,7 @@ export const Profile = () => {
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleClose}>Cancel</Button>
-                  <Button type="submit">Subscribe</Button>
+                  <Button type="submit">Add</Button>
                 </DialogActions>
               </Dialog>
           </div>
@@ -169,7 +205,43 @@ export const Profile = () => {
           {
             user.data.is_admin ?<Link to='/admin'><button className='admin-button'>Admin Panel</button></Link> : <></>
           }
-          <button className='lodout-button'>Log out</button>
+        
+        </div>
+        <hr />
+        <div className="center-flex user_orders">
+          <span>YOUR ORDERS</span>
+          <table  className="orders-table user-orders-table" >
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Total amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{moment(item.date).format('YYYY-MM-DD HH:mm:ss')}</td>
+                  <td>$ {item.total_amount}</td>
+                  <td>{item.status}</td>
+                  <td>
+                    {item.status === "Processing" ? (
+                      <button className="complete-order-button"
+                        onClick={() => {
+                          cancelOrder(item.id);
+                        }}
+                      >
+                        CANCEL
+                      </button>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

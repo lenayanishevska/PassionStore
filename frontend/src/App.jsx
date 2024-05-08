@@ -12,8 +12,10 @@ import { Profile } from './Pages/Profile/Profile'
 import { Admin } from './Pages/Admin/Admin';
 import { Page } from './Pages/Page';
 import { OrderInfo } from './Pages/OrderInfo/OrderInfo'
+import { useDispatch, useSelector} from 'react-redux';
 
 function App() {
+  const user = useSelector(state => state.userLogin.userInfo);
   return (
     <div>
       <BrowserRouter>
@@ -26,12 +28,12 @@ function App() {
         {/* <Route path='/products/:category/:subcategory/:productId' element={<ProductDetail/>}></Route> */}
         <Route path='/products/:category/:productId' element={<ProductDetail/>}></Route>
 
-        <Route path='/cart' element={<Cart/>}></Route>
-        <Route path='/orderInfo' element={<OrderInfo/>}></Route>
+        <Route path='/cart' element={user ? <Cart/> : <Login></Login>}></Route>
+        <Route path='/orderInfo' element={user ? <OrderInfo/>: <AboutUs></AboutUs>}></Route>
         <Route path='/login' element={<Login/>} ></Route>
-        <Route path='/profile' element={<Profile/>} ></Route>
+        <Route path='/profile' element={user ? <Profile/> : <Login></Login>} ></Route>
         <Route path='/registration' element={ <Registration/>}></Route>
-        <Route path='/admin' element={ <Admin/>}></Route>
+        <Route path='/admin' element={user && user.data.is_admin ? <Admin/>:<AboutUs></AboutUs>}></Route>
         <Route path='/pages/:alias' element={<Page/>}></Route>
 
       </Routes>

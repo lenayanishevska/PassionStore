@@ -11,7 +11,6 @@ export const Hero = () => {
       };
   return (
     <div className='hero-img' style={backgroundImageStyle}>
-        <Link to='/aboutUs'><button>About us</button></Link>
     </div>
   )
 }

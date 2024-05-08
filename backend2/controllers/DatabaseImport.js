@@ -361,20 +361,12 @@ class DatabaseImport {
             await readManProductsData('men/T-SHIRTS.csv', 4, 'c1f48240-aabe-4f2f-8820-4d5f8bccfa95.jpg');
             await readManProductsData('men/TROUSERS.csv', 26, 'e9e6acf7-e0e2-44ec-9ed9-303ab762194b.jpg');
             // await readProductsData('men/SWEATERS.csv', 22, '');
-            
             await readManProductsData('men/SHIRTS.csv', 24, 'c6967c40-c38f-425a-9e1e-6931416d8d93.jpg');
-            
-
-
-            
-
+                
             await generateOrders();
 
-
-            // Відправка успішного повідомлення, якщо операція завершилась успішно
             res.status(200).json({ message: 'Data imported successfully' });
         } catch (error) {
-            // Обробка помилок
             console.error('Error importing data:', error);
             res.status(500).json({ error: 'Internal server error' });
         }

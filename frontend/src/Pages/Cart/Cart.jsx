@@ -6,12 +6,17 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setOrderInfo } from '../../redux/Reducers/OrderReducer';
 import { message } from 'antd';
+import axios from "axios";
+
 
 export const Cart = () => {
   const user = useSelector(state => state.userLogin.userInfo);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [list, SetList] = useState([]);
+  const [list, setList] = useState([]);
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const [createOrder] = useCreateOrderMutation();
 
@@ -20,26 +25,48 @@ export const Cart = () => {
   }
 
   const userId = user.data.id;
-  const { data, refetch} = useGetOrderProductsQuery(userId);
-  const cartProducts = data ? data.data : [];
+
+  const reload = () => {
+    setIsLoading(true);
+    axios
+      .get(`http://localhost:5001/api/shop/products/cartProductList?userId=${userId}`)
+      .then((response) => {
+        console.log(response)
+        setIsError(false);
+        setIsLoading(false);
+        setList(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsError(true);
+        setIsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    reload();
+  }, []);
+
 
   const handleCreateOrder = async () => {
-    const res = await createOrder({ userId: user.data.id }).unwrap();
-    console.log(res);
-    if(res.success === false){
-      message.error(res.message)
+    if(user.data.address) {
+      const res = await createOrder({ userId: user.data.id }).unwrap();
+      console.log(res);
+      if(res.success === false){
+        message.error(res.message)
+      }
+      else{
+        dispatch(setOrderInfo(res));
+        navigate('/orderInfo');
+      }
     }
-    else{
-      dispatch(setOrderInfo(res));
-      navigate('/orderInfo');
+    else {
+      message.error("Please, add your address in profile and log in again!")
     }
   }
 
-  useEffect(() => {
-    refetch();
-  }, [cartProducts]);
 
-  const total = cartProducts.reduce((accumulator, item) => {
+  const total = list.reduce((accumulator, item) => {
     return accumulator + item.amount;
   }, 0).toFixed(2);
 
@@ -62,9 +89,9 @@ export const Cart = () => {
           </div>
         </div>
         {
-          cartProducts.map((item) => {
+          list.map((item) => {
               return (
-                  <CartProduct key={item.id} item={item} />
+                  <CartProduct key={item.id} item={item} reload={reload}/>
               )
         })}
       </div>
